@@ -42,7 +42,9 @@ begin
 			if (i_rst_n /= '1') then 
 				shift_reg		<= (others => '0');
 			else
-				if (i_shift_en = '1') then -- copy from the MAXIM datasheet of DS18B20
+				if (i_shift_en = '1') then 
+				-- copy from the MAXIM datasheet of DS18B20
+					-- 8-bit, poly x^8 + x^5 + x^4 + 1
 					shift_reg(0) 	<= i_din xor shift_reg(7);
 					shift_reg(1) 	<= shift_reg(0);
 					shift_reg(2) 	<= shift_reg(1);

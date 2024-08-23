@@ -7,9 +7,10 @@
 -- Description: 	Down-convert fast clock to a pseudo slow clock and its tick.
 --					Clock divider: period (o_clk) = P * period (i_clk)
 -- ------------------------------------------------------------------------------------------------------------
-
+-- altera vhdl_input_version vhdl_2008 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity pseudo_clock_down_convertor is
 generic (
