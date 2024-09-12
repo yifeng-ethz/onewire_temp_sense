@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ip>
+ <presets version="12.1">
+  <preset
+     name="scifi_onewire_master"
+     kind="onewire_master"
+     version="All"
+     description="Pin assignment and timing settings for temperature sensors adapted for the SciFi DAB 2.2 and later versions. IP must be used on the (Arria V) Front-end Board.">
+   <parameter name="TX_SLOT_US" value="90" />
+   <parameter name="RX_PULL_LOW_US" value="5" />
+   <parameter name="N_DQ_LINES" value="6" />
+   <parameter name="AVST_DATA_WIDTH" value="8" />
+   <parameter name="MASTER_WAIT_PRESENCE_US" value="45" />
+   <parameter name="RX_BUFFER_DEPTH" value="16" />
+   <parameter name="TX_PULL_LOW_US" value="5" />
+   <parameter name="AVMM_DATA_WIDTH" value="32" />
+   <parameter name="REF_CLOCK_RATE" value="156250000" />
+   <parameter name="VARIANT" value="lite" />
+   <parameter name="SLOTS_SEPERATION_US" value="5" />
+   <parameter name="TX_BUFFER_DEPTH" value="8" />
+   <parameter name="AVST_CHANNEL_WIDTH" value="3" />
+   <parameter name="MASTER_SAMPLE_PRESENCE_TIMEOUT_US" value="1000" />
+   <parameter name="RX_SLOT_US" value="90" />
+   <parameter name="PARACITIC_POWERING" value="false" />
+   <parameter name="MASTER_INIT_RESET_US" value="500" />
+   <parameter name="DEBUG_LV" value="0" />
+   <parameter name="RX_MASTER_SAMPLE_US" value="10" />
+  </preset>
+ </presets>
+</ip>

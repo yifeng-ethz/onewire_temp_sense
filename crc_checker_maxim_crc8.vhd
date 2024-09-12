@@ -5,13 +5,14 @@
 -- Revision: 		1.1 (IP-wrapping)
 -- Description: 	check the crc value by shifting in the bit stream 
 -- ------------------------------------------------------------------------------------------------------------
--- ==== do NOT delete me! ====
+-- ================ synthsizer configuration =================== 
 -- altera vhdl_input_version vhdl_2008 
--- ==== do NOT delete me! ====
+-- ================ synthsizer configuration =================== 
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.or_reduce;
 
 entity crc_checker_maxim_crc8 is
 port (
@@ -23,7 +24,7 @@ port (
 	o_crc_error		: out std_logic; -- it is the upper module's responsibility to check error at the right cycle, otherwise it is invalid. 
 	-- clock and reset interface
 	i_clk			: in  std_logic;
-	i_rst_n			: in  std_logic
+	i_rst			: in  std_logic
 );
 end entity crc_checker_maxim_crc8;
 
@@ -36,10 +37,10 @@ begin
 	o_lfsr 			<= shift_reg;
 	o_crc_error		<= or_reduce(shift_reg); -- at end state all zeros are good
 	
-	proc_lfsr_checker : process (i_clk,i_rst_n) 
+	proc_lfsr_checker : process (i_clk,i_rst) 
 	begin
 		if (rising_edge(i_clk)) then 
-			if (i_rst_n /= '1') then 
+			if (i_rst = '1') then 
 				shift_reg		<= (others => '0');
 			else
 				if (i_shift_en = '1') then 
