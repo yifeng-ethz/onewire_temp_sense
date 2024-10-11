@@ -26,6 +26,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use IEEE.math_real.log2;
 use IEEE.math_real.ceil;
+use ieee.std_logic_misc.or_reduce;
 -- altera-specific
 LIBRARY altera_mf;
 USE altera_mf.all;
@@ -113,6 +114,16 @@ architecture rtl of onewire_master is
 	-- **global**
 	-- constants
 	constant MAX_RXTX_BYTES		: natural := MAX_BUFFER_DEPTH; -- not supported: maximum(RX_BUFFER_DEPTH,TX_BUFFER_DEPTH);
+	-- need to convert natural into unsigned, otherwise integer comparision in vhdl does not work correctly.
+	constant MASTER_INIT_RESET_US_U					: unsigned(15 downto 0) := to_unsigned(MASTER_INIT_RESET_US,16);
+	constant MASTER_WAIT_PRESENCE_US_U				: unsigned(15 downto 0) := to_unsigned(MASTER_WAIT_PRESENCE_US,16);
+	constant MASTER_SAMPLE_PRESENCE_TIMEOUT_US_U	: unsigned(15 downto 0) := to_unsigned(MASTER_SAMPLE_PRESENCE_TIMEOUT_US,16);
+	constant SLOTS_SEPERATION_US_U					: unsigned(15 downto 0) := to_unsigned(SLOTS_SEPERATION_US,16);
+	constant RX_SLOT_US_U							: unsigned(15 downto 0) := to_unsigned(RX_SLOT_US,16);
+	constant RX_PULL_LOW_US_U						: unsigned(15 downto 0) := to_unsigned(RX_PULL_LOW_US,16);
+	constant RX_MASTER_SAMPLE_US_U					: unsigned(15 downto 0) := to_unsigned(RX_MASTER_SAMPLE_US,16);
+	constant TX_SLOT_US_U							: unsigned(15 downto 0) := to_unsigned(TX_SLOT_US,16);
+	constant TX_PULL_LOW_US_U						: unsigned(15 downto 0) := to_unsigned(TX_PULL_LOW_US,16);
 	
 	-- ---------------------------------
 	-- slow_clock_convertor
@@ -124,8 +135,8 @@ architecture rtl of onewire_master is
 	-- slow_timer
 	-- ------------------------------------
 	signal slow_timer_on			: std_logic;
-	signal slow_timer_cnt_unsigned	: unsigned(15 downto 0);
-	signal slow_timer_cnt			: integer range 0 to 2*15-1;
+	signal slow_timer_cnt_unsigned	: unsigned(15 downto 0); -- overflow at 65536, which gives max timing table up to 65ms. 
+	--signal slow_timer_cnt			: integer range 0 to 2*15-1;
 	
 	-- ---------------------------
 	-- tx_fifo
@@ -224,6 +235,9 @@ architecture rtl of onewire_master is
 		write_one_done			: std_logic;
 		flow					: interface_hub_flow_t;
 		pipe_handler			: pipe_handler_t;
+		rx_rdreq				: std_logic;
+		tx_wrreq				: std_logic;
+		tx_data					: std_logic_vector(AVST_DATA_WIDTH+AVST_CHANNEL_WIDTH-1 downto 0);
 	end record;
 	
 	type csrerror_t is record
@@ -232,7 +246,7 @@ architecture rtl of onewire_master is
 	end record;
 	type csr_t is record
 		commit					: std_logic;
-		is_compl				: std_logic; -- polling for completion
+		busy					: std_logic; -- polling for completion
 		direction				: std_logic; -- 1:TX, 0:RX
 		tot_bytes				: natural range 0 to MAX_RXTX_BYTES; -- default: up to 16 
 		usewire_id				: std_logic;
@@ -247,7 +261,7 @@ architecture rtl of onewire_master is
 	constant csrerror_rst		: csrerror_t := (out_of_range => '0', init_fail => '0');
 	constant csr_rst			: csr_t :=(
 		commit					=> '0',
-		is_compl				=> '0',
+		busy					=> '0',
 		direction				=> '0',
 		tot_bytes				=> 0,
 		usewire_id				=> '0',
@@ -288,6 +302,7 @@ architecture rtl of onewire_master is
 		wire_id					: natural range 0 to N_DQ_LINES-1; -- select the dq line index
 		dq						: sense_bidir_io_group_t;
 		error_init_fail			: std_logic;
+		error_fifo_empty		: std_logic;
 	end record;
 	
 	-- signals
@@ -306,6 +321,8 @@ architecture rtl of onewire_master is
 		bit_cnt					: natural range 0 to AVST_DATA_WIDTH;
 		byte_cnt				: natural range 0 to MAX_RXTX_BYTES;
 		dq						: sense_bidir_io_group_t;
+		updated					: std_logic;
+		error_fifo_full			: std_logic;
 	end record;
 	
 	-- signals
@@ -322,8 +339,7 @@ architecture rtl of onewire_master is
 	-- word 0
 	type csr_w_0_t is record
 		commit					: std_logic_vector(0 downto 0);
-		is_compl				: std_logic_vector(0 downto 0);
-		error					: std_logic_vector(9 downto 8);
+		busy					: std_logic_vector(0 downto 0);
 	end record;
 	-- word 1
 	type csr_w_1_t is record
@@ -423,10 +439,10 @@ begin
 		end if;
 	end process;
 	
-	proc_slow_timer_comb : process (all)
-	begin
-		slow_timer_cnt		<= to_integer(slow_timer_cnt_unsigned);
-	end process;
+--	proc_slow_timer_comb : process (all)
+--	begin
+--		slow_timer_cnt		<= to_integer(slow_timer_cnt_unsigned);
+--	end process;
 	
 	-- ----------------------------
 	-- arbiter 
@@ -484,20 +500,13 @@ begin
 				elsif (tx_fifo.empty = '1') then -- stop flush after empty is hit
 					tx_fifo.sclr			<= '0';
 				end if;
-				
-				-- coupled to avst tx port
-				--tx_fifo.wrreq		<= asi_tx_valid;
-				
+			
 			end if;
-			-- ==================== no reset ==========================
-			--tx_fifo.data			<= asi_tx_channel & asi_tx_data;
+		
 		end if;
 	end process;
 	
-	proc_proc_tx_fifo_comb : process (all)
-	begin
-		asi_tx_ready		<= (not tx_fifo.full) and (not tx_fifo.sclr);
-	end process ;
+
 	
 	-- -----------------------------
 	-- rx_fifo
@@ -539,10 +548,15 @@ begin
 			if (rsi_reset_reset = '1') then 
 				rx_fifo.sclr			<= '1';
 			else
-				-- user may start another command only if fifo is not empty, but it is the user's resbonsibility to prevent fifo overflow. In such event, all data will be flushed.
-				if (rx_fifo.full = '1') then -- triggered by full
-					rx_fifo.sclr			<= '1';
-				elsif (rx_fifo.empty = '1') then -- stop flush after empty is hit
+				-- user may start another command only if fifo is not empty, but it is the user's resbonsibility to prevent fifo overflow. 
+				-- In overflow event, all data will be flushed. (DEBUG)
+				if (DEBUG_LV > 0) then 
+					if (rx_fifo.full = '1') then -- triggered by full
+						rx_fifo.sclr			<= '1';
+					elsif (rx_fifo.empty = '1') then -- stop flush after empty is hit
+						rx_fifo.sclr			<= '0';
+					end if;
+				else -- in overflow event, data are kept in the fifo and command will be ack'd early. 
 					rx_fifo.sclr			<= '0';
 				end if;
 				-- TODO: add avst read port 
@@ -570,7 +584,7 @@ begin
 			else 
 				-- interface logic
 				-- +-------------------------------------------------------------------------------------------+
-				-- | Input        :    csr.is_compl                                                            |
+				-- | Input        :    csr.busy                                                                |
 				-- | ========================================================================================= |
 				-- | Routine type :    memory-mapped interface (mmio)                                          |
 				-- | Routine name :    Control and Status Register Hub                                         |
@@ -583,8 +597,11 @@ begin
 				-- | Address map  :    (32b word addressing)                                                   |
 				-- |                   0: control and status                                                   |
 				-- |                       [??][??][?E][?C]                                                    |
-				-- |                       E: out-of-range error. '1': error.                                  |
-				-- |                       C: commit/is_completed. write '1' to commit, read/polling           |
+				-- |                       E: error sympton                                                    | 
+				-- |                           2: rx_fifo_empty                                                |
+				-- |                           1: out_of_range                                                 |
+				-- |                           0: init_fail                                                    |
+				-- |                       C: commit/busyeted. write '1' to commit, read/polling               |
 				-- |                          '0' to sense completion.                                         |
 				-- |                                                                                           |
 				-- |                   1: transfer command descriptor                                          |
@@ -611,67 +628,78 @@ begin
 				avs_ctrl_waitrequest			<= '1';
 				-- logic
 				if (avs_ctrl_read = '1') then -- read
+					ins_complete_irq			<= '0'; -- clear the irq once read is performed
 					avs_ctrl_waitrequest		<= '0';
 					case to_integer(unsigned(avs_ctrl_address)) is
 						when 0 =>
-							avs_ctrl_readdata(mmap.csr_w_0.is_compl'range)(0)		<= csr.is_compl;
-							avs_ctrl_readdata(mmap.csr_w_0.error'range)(0)			<= csr.error.out_of_range;
-							avs_ctrl_readdata(mmap.csr_w_0.error'range)(1)			<= csr.error.init_fail;
+							avs_ctrl_readdata(0)			<= csr.busy;
+							avs_ctrl_readdata(8)			<= csr.error.out_of_range;
+							avs_ctrl_readdata(9)			<= csr.error.init_fail;
+							avs_ctrl_readdata(10)			<= tx_engine.error_fifo_empty;
+							avs_ctrl_readdata(11)			<= rx_engine.error_fifo_full;
 						when 1 => 
-							avs_ctrl_readdata(mmap.csr_w_1.direction'range)(0)		<= csr.direction;
-							avs_ctrl_readdata(mmap.csr_w_1.init'range)(0)			<= csr.init;
-							avs_ctrl_readdata(mmap.csr_w_1.paracitic_pw'range)(0)	<= csr.paracitic_pw;
-							avs_ctrl_readdata(mmap.csr_w_1.usewire_id'range)(0)		<= csr.usewire_id;
+							avs_ctrl_readdata(mmap.csr_w_1.direction'range)(0)									<= csr.direction;
+							avs_ctrl_readdata(mmap.csr_w_1.init'range)(mmap.csr_w_1.init'low)					<= csr.init;
+							avs_ctrl_readdata(mmap.csr_w_1.paracitic_pw'range)(mmap.csr_w_1.paracitic_pw'low)	<= csr.paracitic_pw;
+							avs_ctrl_readdata(mmap.csr_w_1.usewire_id'range)(mmap.csr_w_1.usewire_id'low)		<= csr.usewire_id;
 							avs_ctrl_readdata(mmap.csr_w_1.tot_bytes'range)			<= std_logic_vector(to_unsigned(csr.tot_bytes,mmap.csr_w_1.tot_bytes'length));
 							avs_ctrl_readdata(mmap.csr_w_1.wire_id'range)			<= std_logic_vector(to_unsigned(csr.wire_id,mmap.csr_w_1.wire_id'length));
 						when 2 => -- poll the fifo fillness. user may start another command only even if fifo is not empty, but it is the user's resbonsibility to prevent fifo overflow. In such event, all data will be flushed.
 							avs_ctrl_readdata(mmap.csr_w_2.rxfifo_usedw'range)		<= rx_fifo.usedw;
 							avs_ctrl_readdata(mmap.csr_w_2.txfifo_usedw'range)		<= tx_fifo.usedw;
 						when 3 => -- read from the rx fifo (bypassing the rx interface)
-							if (rx_fifo.rdreq = '0') then 
-								avs_ctrl_waitrequest		<= '1';
+							if (interface_hub.rx_rdreq = '0') then 
+								avs_ctrl_waitrequest		<= '0';
 								if (interface_hub.read_one_done = '0') then -- if this command is not digested
-									rx_fifo.rdreq				<= '1';
 									interface_hub.read_one_done	<= '1';
-									avs_ctrl_readdata(rx_fifo.q'high downto 0)			<= rx_fifo.q; -- ch + data portion
+									if (rx_fifo.empty = '0') then -- some fifo empty indication
+										avs_ctrl_readdata(rx_fifo.q'high downto 0)			<= rx_fifo.q; -- ch + data portion
+										interface_hub.rx_rdreq			<= '1';
+									end if;
 								end if;
 							else
-								rx_fifo.rdreq				<= '0';
-								avs_ctrl_waitrequest		<= '0';
+								interface_hub.rx_rdreq		<= '0';
+								avs_ctrl_waitrequest		<= '1';
+								avs_ctrl_readdata			<= (others => '0');
 							end if;
 						when others =>
 							null;
 					end case;
 				elsif (avs_ctrl_write = '1') then -- write
+					ins_complete_irq			<= '0'; -- clear the irq once write is performed
 					avs_ctrl_waitrequest		<= '0';
 					case to_integer(unsigned(avs_ctrl_address)) is
 						when 0 =>
 							csr.commit						<= avs_ctrl_writedata(mmap.csr_w_0.commit'range)(0);
 						when 1 => -- descriptor of master transaction
-							csr.direction					<= avs_ctrl_writedata(mmap.csr_w_1.direction'range)(0);
-							csr.init						<= avs_ctrl_writedata(mmap.csr_w_1.init'range)(mmap.csr_w_1.init'low);
-							if (not PARACITIC_POWERING) then -- only writtable when not set by generic
-								csr.paracitic_pw				<= avs_ctrl_writedata(mmap.csr_w_1.paracitic_pw'range)(mmap.csr_w_1.paracitic_pw'low);
-							end if;
-							csr.usewire_id					<= avs_ctrl_writedata(mmap.csr_w_1.usewire_id'range)(mmap.csr_w_1.usewire_id'low);
-							if (check_list.result = '0') then -- validate input range 
-								csr.tot_bytes					<= to_integer(unsigned(avs_ctrl_writedata(mmap.csr_w_1.tot_bytes'range)));
-								csr.wire_id						<= to_integer(unsigned(avs_ctrl_writedata(mmap.csr_w_1.wire_id'range)));
-							else
-								csr.error.out_of_range			<= '1';
+							if (csr.busy = '1') then 
+								-- refuse the write to the descriptor, as it is protected for the exclusive use for the rx and tx engine
+							else 
+								csr.direction					<= avs_ctrl_writedata(mmap.csr_w_1.direction'range)(0);
+								csr.init						<= avs_ctrl_writedata(mmap.csr_w_1.init'range)(mmap.csr_w_1.init'low);
+								if (not PARACITIC_POWERING) then -- only writtable when not set by generic
+									csr.paracitic_pw				<= avs_ctrl_writedata(mmap.csr_w_1.paracitic_pw'range)(mmap.csr_w_1.paracitic_pw'low);
+								end if;
+								csr.usewire_id					<= avs_ctrl_writedata(mmap.csr_w_1.usewire_id'range)(mmap.csr_w_1.usewire_id'low);
+								if (check_list.result = '0') then -- validate input range 
+									csr.tot_bytes					<= to_integer(unsigned(avs_ctrl_writedata(mmap.csr_w_1.tot_bytes'range)));
+									csr.wire_id						<= to_integer(unsigned(avs_ctrl_writedata(mmap.csr_w_1.wire_id'range)));
+								else
+									csr.error.out_of_range			<= '1';
+								end if;
 							end if;
 						when 2 => -- flush the fifo
 							-- TODO: add flushing logic, so far user could also flush by issuing empty command.
-						when 3 => -- write to the tx fifo (bypassing the tx interface)
-							if (tx_fifo.wrreq = '0') then 
+						when 4 => -- write to the tx fifo (bypassing the tx interface)
+							if (interface_hub.tx_wrreq = '0') then 
 								if (interface_hub.write_one_done = '0') then
-									tx_fifo.wrreq					<= '1';
+									interface_hub.tx_wrreq			<= '1';
 									interface_hub.write_one_done	<= '1';
 								end if;
-								tx_fifo.data			<= avs_ctrl_writedata(tx_fifo.data'high downto 0); -- ch + data
+								interface_hub.tx_data	<= avs_ctrl_writedata(tx_fifo.data'high downto 0); -- ch + data
 								avs_ctrl_waitrequest	<= '1';
 							else
-								tx_fifo.wrreq			<= '0';
+								interface_hub.tx_wrreq	<= '0';
 								avs_ctrl_waitrequest	<= '0';
 							end if;
 						when others =>
@@ -688,7 +716,7 @@ begin
 					-- | Pipe name    :    "tx"                                                                    |
 					-- | Pipe signals :    'start` 'done`                                                          | 
 					-- | ========================================================================================= |
-					-- | Output       :    csr.is_compl                                                            |
+					-- | Output       :    csr.busy                                                                |
 					-- +-------------------------------------------------------------------------------------------+
 					-- routine_ipc_pipe_handler_parent
 					case interface_hub.pipe_handler is 
@@ -701,8 +729,8 @@ begin
 									interface_hub.pipe_handler				<= RX_ACK;
 									pipe.rx.start							<= '1'; 
 								end if;
-								csr.is_compl						<= '0'; -- unset the finish marker, so polling is valid
-								csr.commit							<= '0'; -- unset the commit, as it is not needed to complete the IPC.
+								csr.busy							<= '1'; -- unset the finish marker, so polling is valid
+								-- NOTE: during handshaking, user may assert commit for a new write (ignored), and the descriptor cannot be set (protected).
 							end if;
 						when TX_ACK => -- hanshake on the pipe
 							if (pipe.tx.start = '1' and pipe.tx.done = '0') then 
@@ -712,8 +740,10 @@ begin
 							elsif (pipe.tx.start = '0' and pipe.tx.done = '1') then 
 								-- wait for child to ack
 							else -- handshake ok, done, some modification of the csr
-								csr.is_compl							<= '1'; -- mark the job is ACK
+								csr.busy								<= '0'; -- mark the job is ACK
+								csr.commit								<= '0'; -- unset the commit, ready for a new commit
 								interface_hub.pipe_handler				<= IDLE; -- go to idle and ready for another csr change
+								ins_complete_irq						<= '1'; -- raise irq to inform completion 
 							end if;
 						when RX_ACK => 
 							if (pipe.rx.start = '1' and pipe.rx.done = '0') then 
@@ -723,24 +753,84 @@ begin
 							elsif (pipe.rx.start = '0' and pipe.rx.done = '1') then 
 								-- wait for child to ack
 							else -- handshake ok, done, some modification of the csr
-								csr.is_compl							<= '1'; -- mark the job is ACK
+								csr.busy								<= '0'; -- mark the job is ACK
+								csr.commit								<= '0'; -- unset the commit, ready for a new commit
 								interface_hub.pipe_handler				<= IDLE; -- go to idle and ready for another csr change
+								ins_complete_irq						<= '1';
 							end if;
 							
 						when others => 
 							null;
 					end case;
-					-- routine to latch other signals
+					
+					-- reset signals for itself 
 					interface_hub.read_one_done			<= '0';
 					interface_hub.write_one_done		<= '0';
+					interface_hub.tx_wrreq				<= '0';
+					interface_hub.rx_rdreq				<= '0';
+					if (DEBUG_LV > 0) then 
+						interface_hub.tx_data				<= (others => '0');
+					end if;
+					-- routine to latch other signals
 					csr.error.init_fail					<= tx_engine.error_init_fail;
-					-- avst rx port
-				
-					
 				end if;
 				
 			end if;
 		end if;
+	end process;
+	
+	proc_interface_hub_comb : process (all)
+	begin
+		-- default
+		rx_fifo.rdreq		<= '0';
+		tx_fifo.data		<= (others => '0');
+		tx_fifo.wrreq		<= '0';
+		aso_rx_valid		<= '0';
+		aso_rx_data			<= (others => '0');
+		aso_rx_channel		<= (others => '0');
+		asi_tx_ready		<= '0'; -- disable tx port during memory-mapped access -- TODO: debug this corner case when switching
+
+		-- resolve the contention 
+		if (avs_ctrl_read = '1') then 
+			rx_fifo.rdreq		<= interface_hub.rx_rdreq; -- wire connection to a register
+		elsif (avs_ctrl_write = '1') then 
+			tx_fifo.wrreq		<= interface_hub.tx_wrreq; -- wire connection to a register
+			tx_fifo.data		<= interface_hub.tx_data;
+		else
+			-- routine to avst tx port
+			-- write to tx fifo and input through avst tx port
+			if (asi_tx_valid = '1' and tx_fifo.full /= '1') then 
+				tx_fifo.wrreq	<= '1';
+				tx_fifo.data(asi_tx_data'high downto 0)		<= asi_tx_data;
+				tx_fifo.data(asi_tx_channel'high+asi_tx_data'high+1 downto asi_tx_data'high+1)	<= asi_tx_channel;
+			else
+				tx_fifo.wrreq	<= '0';
+			end if;
+			
+			if (tx_fifo.full /= '1') then 
+				asi_tx_ready	<= '1'; -- drive ready when not full
+			else
+				asi_tx_ready	<= '0';
+			end if;
+			
+			if (rx_fifo.empty /= '1') then 
+				aso_rx_valid	<= '1'; -- pull high if not empty
+			else
+				aso_rx_valid	<= '0';
+			end if;
+			
+			-- routine to avst rx port
+			-- read from rx fifo and output through avst rx port 
+			if (aso_rx_ready = '1' and rx_fifo.empty = '0') then -- direct comb connection
+				rx_fifo.rdreq	<= '1'; -- read fifo
+				aso_rx_data		<= rx_fifo.q(aso_rx_data'high downto 0); 
+				aso_rx_channel	<= rx_fifo.q(aso_rx_channel'high+aso_rx_data'high+1 downto aso_rx_data'high+1);
+			else 
+				rx_fifo.rdreq	<= '0';
+				aso_rx_valid	<= '0';
+			end if;
+		end if;
+	
 	end process;
 	
 
@@ -774,7 +864,13 @@ begin
 						end if;
 					when LOAD_TX_DATA => -- read the fifo and latch a symbol (byte), 2 cycles
 						if (tx_fifo.rdreq = '0') then 
-							tx_fifo.rdreq				<= '1';
+							if (tx_fifo.empty = '1') then -- danger, rx fifo empty (underflow), escape
+								tx_engine.flow				<= ACK;
+								tx_engine.error_fifo_empty	<= '1';
+							else -- rx fifo is not empty, we continue
+								tx_fifo.rdreq				<= '1';
+								tx_engine.error_fifo_empty	<= '0'; -- clear the fifo flag
+							end if;
 						elsif (tx_fifo.rdreq = '1') then
 							if (csr.init = '0') then  -- skip init pulse or not
 								tx_engine.flow				<= SEND_BIT;
@@ -796,13 +892,14 @@ begin
 						case tx_engine.init_timing is
 							when MASTER_TX_RESET =>
 								tx_engine.dq(tx_engine.wire_id)			<= PULL_LOW;
-								tx_engine.slow_timer_on								<= '1'; -- start timer, so this timing state is moving forward
+								tx_engine.slow_timer_on					<= '1'; -- start timer, so this timing state is moving forward
 							when MASTER_RELEASE =>
 								tx_engine.dq(tx_engine.wire_id)			<= HIGH_Z;
+								tx_engine.error_init_fail				<= '1'; -- set the error flag, so by default the slave is not present
 							when MASTER_SENSE_PRESENCE =>
 								tx_engine.dq(tx_engine.wire_id)			<= HIGH_Z;
 								if (coe_sense_dq_in(tx_engine.wire_id) = '0') then 
-									tx_engine.error_init_fail							<= '0'; -- clear error
+									tx_engine.error_init_fail			<= '0'; -- clear error
 								end if;
 							when MASTER_EVAL => -- only 1 cycle
 								tx_engine.slow_timer_on								<= '0'; -- stop timer and reset it
@@ -844,24 +941,24 @@ begin
 									tx_engine.dq(tx_engine.wire_id)			<= HIGH_Z;
 								end if;
 							when MASTER_EVAL => -- only 1 cycle
-								tx_engine.slow_timer_on								<= '0'; -- stop timer and reset it
+								tx_engine.slow_timer_on					<= '0'; -- stop timer and reset it
+								tx_engine.updated						<= '0'; -- reset for this bit
 								if (tx_engine.bit_cnt = AVST_DATA_WIDTH) then -- end of one byte, incr byte count. default: 8
-									tx_engine.bit_cnt							<= 0;
-									tx_engine.byte_cnt							<= tx_engine.byte_cnt + 1;
-									tx_engine.flow								<= EVAL;
-									-- reset for this bit
-									tx_engine.updated							<= '0';
-									tx_engine.bit_cnt							<= 0;
+									tx_engine.bit_cnt						<= 0;
+									tx_engine.byte_cnt						<= tx_engine.byte_cnt + 1;
+									tx_engine.flow							<= EVAL;
+									-- reset for this byte
+									tx_engine.bit_cnt						<= 0;
 								else -- cont. another bit
 									-- as the timer is reset, bit_timing will move to starting point
 								end if;
-								
 							when others =>
 								null;
 						end case;
 					when EVAL =>
 						if (tx_engine.byte_cnt = csr.tot_bytes) then -- finish the tx
 							tx_engine.flow								<= ACK;
+							tx_engine.byte_cnt							<= 0;
 						else -- cont. another byte
 							tx_engine.flow								<= LOAD_TX_DATA;
 						end if; 
@@ -886,6 +983,7 @@ begin
 						tx_engine.tx_data				<= (others => '0');
 						tx_engine.updated				<= '0';
 						tx_engine.error_init_fail		<= '0';
+						tx_engine.error_fifo_empty		<= '0';
 						-- reset remote registers
 						tx_fifo.rdreq					<= '0';
 						-- export signals
@@ -915,26 +1013,28 @@ begin
 				-- timings as set by the generic parameters
 				-- for init_timing
 				if (tx_engine.flow = SEND_INIT) then 
-					if (slow_timer_cnt < MASTER_INIT_RESET_US) then 
+					if (slow_timer_cnt_unsigned < MASTER_INIT_RESET_US_U) then 
 						tx_engine.init_timing		<= MASTER_TX_RESET;
-					elsif(slow_timer_cnt = MASTER_INIT_RESET_US) then 
+					elsif(slow_timer_cnt_unsigned = MASTER_INIT_RESET_US_U) then 
 						tx_engine.init_timing		<= MASTER_RELEASE;
-					elsif(slow_timer_cnt = MASTER_INIT_RESET_US + MASTER_WAIT_PRESENCE_US) then 
+					elsif(slow_timer_cnt_unsigned = MASTER_INIT_RESET_US_U + MASTER_WAIT_PRESENCE_US_U) then 
 						tx_engine.init_timing		<= MASTER_SENSE_PRESENCE;
-					elsif (slow_timer_cnt = MASTER_INIT_RESET_US + MASTER_WAIT_PRESENCE_US + MASTER_SAMPLE_PRESENCE_TIMEOUT_US) then -- timeout to detect slave pulse
+					elsif (slow_timer_cnt_unsigned = MASTER_INIT_RESET_US_U + MASTER_WAIT_PRESENCE_US_U + MASTER_SAMPLE_PRESENCE_TIMEOUT_US_U) then -- timeout to detect slave pulse
 						tx_engine.init_timing		<= MASTER_EVAL;
 					end if;
+					tx_engine.bit_timing			<= MASTER_PULL_LOW; -- starting point
 				-- for bit_timing
 				elsif (tx_engine.flow = SEND_BIT) then
-					if (slow_timer_cnt < TX_PULL_LOW_US) then
+					if (slow_timer_cnt_unsigned < TX_PULL_LOW_US_U) then
 						tx_engine.bit_timing		<= MASTER_PULL_LOW;
-					elsif (slow_timer_cnt = TX_PULL_LOW_US) then
+					elsif (slow_timer_cnt_unsigned = TX_PULL_LOW_US_U) then
 						tx_engine.bit_timing		<= MASTER_SEND_BIT;
-					elsif (slow_timer_cnt = TX_PULL_LOW_US + TX_SLOT_US) then 
+					elsif (slow_timer_cnt_unsigned = TX_PULL_LOW_US_U + TX_SLOT_US_U) then 
 						tx_engine.bit_timing		<= MASTER_IDLE;
-					elsif (slow_timer_cnt = TX_PULL_LOW_US + TX_SLOT_US + SLOTS_SEPERATION_US) then 
+					elsif (slow_timer_cnt_unsigned = TX_PULL_LOW_US_U + TX_SLOT_US_U + SLOTS_SEPERATION_US_U) then 
 						tx_engine.bit_timing		<= MASTER_EVAL;
 					end if;
+					tx_engine.init_timing			<= MASTER_TX_RESET; -- starting point
 				else -- during other state, pull the small timing state into default starting point
 					tx_engine.init_timing			<= MASTER_TX_RESET; -- starting point
 					tx_engine.bit_timing			<= MASTER_PULL_LOW; -- starting point
@@ -977,7 +1077,7 @@ begin
 								-- this sample is 1 us, so TODO: add debounce for the rx data
 								rx_engine.dq(csr.wire_id)				<= HIGH_Z;
 								-- get the 1-bit data from the dq line, if pull down by slave, then it is '0'. 
-								rx_engine.rx_data(rx_engine.bit_cnt)			<= coe_sense_dq_in(csr.wire_id);
+								rx_engine.rx_data(rx_engine.bit_cnt)	<= coe_sense_dq_in(csr.wire_id);
 							when MASTER_IDLE =>
 								-- restore the idle state of the dq line
 								if (csr.paracitic_pw = '1') then
@@ -985,11 +1085,16 @@ begin
 								else 
 									rx_engine.dq(csr.wire_id)			<= HIGH_Z;
 								end if;
+								if (rx_engine.updated = '0') then -- update the bit counter
+									rx_engine.bit_cnt					<= rx_engine.bit_cnt + 1;
+									rx_engine.updated					<= '1';
+								end if;
 							when MASTER_EVAL => -- only one cycle
 								rx_engine.slow_timer_on							<= '0'; -- stop timer and reset it, so immediate go back
+								rx_engine.updated								<= '0';
 								if (rx_engine.bit_cnt = AVST_DATA_WIDTH) then -- end of one byte, incr byte count. default: 8
 									rx_engine.bit_cnt							<= 0;
-									rx_engine.byte_cnt							<= tx_engine.byte_cnt + 1;
+									rx_engine.byte_cnt							<= rx_engine.byte_cnt + 1;
 									rx_engine.flow								<= STORE_RX_DATA; -- inform the later state to load data
 									rx_engine.bit_cnt							<= 0;
 								else -- cont. another bit
@@ -1000,11 +1105,19 @@ begin
 						end case;
 					when STORE_RX_DATA => -- actually only store a symbol (byte)
 						if (rx_fifo.wrreq = '0') then 
-							rx_fifo.wrreq				<= '1';
+							-- fifo full protection
+							if (rx_fifo.full = '1') then -- TODO: abort or continue?
+								rx_engine.error_fifo_full	<= '1';
+								rx_engine.flow				<= ACK; -- abort here, as the data maybe corrupted
+							else 
+								rx_engine.error_fifo_full	<= '0'; -- clear the error flag
+								rx_fifo.wrreq				<= '1';
+								rx_fifo.data				<= std_logic_vector(to_unsigned(csr.wire_id,AVST_CHANNEL_WIDTH)) & rx_engine.rx_data;
+							end if;
 						elsif (rx_fifo.wrreq = '1') then
 							rx_fifo.wrreq				<= '0';
-							rx_fifo.data				<= std_logic_vector(to_unsigned(csr.wire_id,AVST_CHANNEL_WIDTH)) & rx_engine.rx_data;
 							if (rx_engine.byte_cnt = csr.tot_bytes) then 
+								rx_engine.byte_cnt			<= 0;
 								rx_engine.flow				<= ACK; -- exit
 							else
 								rx_engine.flow				<= RECV_BIT; -- continue with another byte
@@ -1025,10 +1138,12 @@ begin
 						-- reset pipes
 						pipe.rx.done					<= '0';
 						-- reset local registers
+						rx_engine.updated				<= '0';
 						rx_engine.slow_timer_on			<= '0';
 						rx_engine.bit_cnt				<= 0;
 						rx_engine.byte_cnt				<= 0;
 						rx_engine.rx_data				<= (others => '0');
+						rx_engine.error_fifo_full		<= '0';
 						-- reset remote registers
 						rx_fifo.wrreq					<= '0';
 						rx_fifo.data					<= (others => '0');
@@ -1057,15 +1172,15 @@ begin
 			-- | Output       :    => [rx_engine] 'rx_engine.bit_timing`                                   |
 			-- +-------------------------------------------------------------------------------------------+
 			if (rx_engine.flow = RECV_BIT) then 
-				if (slow_timer_cnt < RX_PULL_LOW_US) then 
+				if (slow_timer_cnt_unsigned < RX_PULL_LOW_US_U) then 
 					rx_engine.bit_timing		<= MASTER_PULL_LOW;
-				elsif (slow_timer_cnt = RX_PULL_LOW_US) then 
+				elsif (slow_timer_cnt_unsigned = RX_PULL_LOW_US_U) then 
 					rx_engine.bit_timing		<= MASTER_RELEASE;
-				elsif (slow_timer_cnt = RX_MASTER_SAMPLE_US) then 
+				elsif (slow_timer_cnt_unsigned = RX_MASTER_SAMPLE_US_U) then 
 					rx_engine.bit_timing		<= MASTER_SAMPLE_BIT;
-				elsif (slow_timer_cnt > RX_MASTER_SAMPLE_US) then 
+				elsif (slow_timer_cnt_unsigned = RX_MASTER_SAMPLE_US_U+1) then 
 					rx_engine.bit_timing		<= MASTER_IDLE;
-				elsif (slow_timer_cnt = RX_SLOT_US) then 
+				elsif (slow_timer_cnt_unsigned = RX_SLOT_US_U) then 
 					rx_engine.bit_timing		<= MASTER_EVAL;
 				end if;
 			else -- default
