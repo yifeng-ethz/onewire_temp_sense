@@ -378,7 +378,7 @@ proc myelaborate {} {
 	# set beats per symbol
 	set_interface_property rx dataBitsPerSymbol [get_parameter_value "AVST_DATA_WIDTH"]
 	set_interface_property tx dataBitsPerSymbol [get_parameter_value "AVST_DATA_WIDTH"]
-	
+	return -code ok
 }
 
 

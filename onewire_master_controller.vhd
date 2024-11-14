@@ -16,6 +16,7 @@
 --						CSR:
 --								Use ::onewire::bsp::proc_control(line_idx,start), where line_index is the line number 
 --								and start=1 for starting the thread and start=0 for stopping the thread.
+
 --								Use ::onewire::bsp::proc_status(line_idx), the return will be error_crc | error_init.
 --
 --						Temperature:

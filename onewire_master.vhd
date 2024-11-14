@@ -6,14 +6,14 @@
 -- Description:         Perform 1-Wire data rx/tx transmission in link and physical layer. 
 -- Usage:                
 -- 		                [RX flow]: 
---                      Master needs to specify the number of bits to receive with avmm (ctrl) port.
+--                      Master needs to specify the number of bits to receive with avmm <ctrl> port.
 --                      Master receives the interrupt signal to indicate data transmission is completed.
--- 		                Master asserts ready in the avst port (rx) to receive the rx data.
+-- 		                Master asserts ready in the avst port <rx> to receive the rx data.
 --
 --                      [TX flow]:
---                      Master needs to specify the number of bits to transmit with avmm (ctrl) port.
---                      Master asserts valid in the avst port (tx) to transmit the tx data.
---                      Master waits for the interrupt or check the avmm (ctrl) to sense the completion. 
+--                      Master needs to specify the number of bits to transmit with avmm <ctrl> port.
+--                      Master asserts valid in the avst port <tx> to transmit the tx data.
+--                      Master waits for the interrupt or check the avmm <ctrl> to sense the completion. 
 -- ------------------------------------------------------------------------------------------------------------
 
 -- ================ synthsizer configuration =================== 	
