@@ -463,10 +463,11 @@ add_display_item "Periphial Circuitry Setting" PARACITIC_POWERING PARAMETER
 add_display_item "" "Timing Diagram" GROUP ""
 
 add_display_item "Timing Diagram" "RX and TX" GROUP tab
-add_display_item "RX and TX" rx_tx_timing_icon ICON ./application_note/rx_and_tx_bit_timing.png
+# Headless qsys-generate cannot render icon assets reliably.
+# add_display_item "RX and TX" rx_tx_timing_icon ICON ./application_note/rx_and_tx_bit_timing.png
 
 add_display_item "Timing Diagram" "Init." GROUP tab
-add_display_item "Init." init_timing_icon ICON ./application_note/init_timing.png
+# add_display_item "Init." init_timing_icon ICON ./application_note/init_timing.png
 
 
 
@@ -637,9 +638,7 @@ add_interface_port reset rsi_reset_reset reset Input 1
 # callbacks
 ################################################
 proc my_elaborate {} {
-	
-	send_message INFO "<b>Hello World!</b> Byte~"
-	
+
 	# ----
 	# derive max fifo depth
 	set rx_d [get_parameter_value "RX_BUFFER_DEPTH"]
@@ -727,6 +726,3 @@ proc my_elaborate {} {
 	
 	
 }
-
-
-
