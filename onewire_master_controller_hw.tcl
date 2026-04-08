@@ -251,7 +251,7 @@ set_interface_property csr holdTime 0
 set_interface_property csr linewrapBursts false
 set_interface_property csr maximumPendingReadTransactions 0
 set_interface_property csr maximumPendingWriteTransactions 0
-set_interface_property csr readLatency 0
+set_interface_property csr readLatency 1
 set_interface_property csr readWaitTime 1
 set_interface_property csr setupTime 0
 set_interface_property csr timingUnits Cycles
@@ -380,7 +380,6 @@ proc myelaborate {} {
 	set_interface_property tx dataBitsPerSymbol [get_parameter_value "AVST_DATA_WIDTH"]
 	return -code ok
 }
-
 
 
 
