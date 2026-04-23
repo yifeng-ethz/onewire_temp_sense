@@ -28,7 +28,7 @@ Usage:
 </html>"
 
 set_module_property NAME onewire_master_controller
-set_module_property VERSION 24.0.918
+set_module_property VERSION 24.1.423
 set_module_property INTERNAL false
 set_module_property OPAQUE_ADDRESS_MAP true
 set_module_property GROUP "Mu3e Control Plane/Modules"
@@ -57,8 +57,8 @@ add_fileset_file pseudo_clock_down_convertor.vhd VHDL PATH pseudo_clock_down_con
 ################################################
 # parameters
 #################################################
-add_parameter REF_CLOCK_RATE NATURAL 156250000
-set_parameter_property REF_CLOCK_RATE DEFAULT_VALUE 156250000
+add_parameter REF_CLOCK_RATE NATURAL 125000000
+set_parameter_property REF_CLOCK_RATE DEFAULT_VALUE 125000000
 set_parameter_property REF_CLOCK_RATE DISPLAY_NAME "Reference clock rate"
 set_parameter_property REF_CLOCK_RATE TYPE NATURAL
 set_parameter_property REF_CLOCK_RATE UNITS Hertz
@@ -380,7 +380,6 @@ proc myelaborate {} {
 	set_interface_property tx dataBitsPerSymbol [get_parameter_value "AVST_DATA_WIDTH"]
 	return -code ok
 }
-
 
 
 

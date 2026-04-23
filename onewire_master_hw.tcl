@@ -34,7 +34,7 @@ Usage:
 </ul>
 </html>"
 set_module_property NAME onewire_master
-set_module_property VERSION 24.0.911.1
+set_module_property VERSION 24.1.423
 set_module_property INTERNAL false
 set_module_property OPAQUE_ADDRESS_MAP true
 set_module_property GROUP "Mu3e Control Plane/Modules"
@@ -168,7 +168,7 @@ set_parameter_property PARACITIC_POWERING DESCRIPTION $dscpt
     
 
 add_parameter REF_CLOCK_RATE NATURAL
-set_parameter_property REF_CLOCK_RATE DEFAULT_VALUE 156_250_000
+set_parameter_property REF_CLOCK_RATE DEFAULT_VALUE 125_000_000
 set_parameter_property REF_CLOCK_RATE DISPLAY_NAME "Reference clock rate"
 set_parameter_property REF_CLOCK_RATE TYPE NATURAL
 set_parameter_property REF_CLOCK_RATE UNITS Hertz
