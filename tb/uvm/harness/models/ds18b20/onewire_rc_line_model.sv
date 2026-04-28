@@ -1,5 +1,14 @@
 `timescale 1ns/1ps
 
+// DS18B20/1-Wire physical-line model scope:
+// This is a first-order RTL-simulation abstraction for FEB OneWire DV. It
+// models open-drain low drive and RC pull-up crossing of the digital VIH
+// threshold. It does not model analog pad impedance, leakage, supply droop,
+// reflections, distributed cable effects, temperature-dependent thresholds,
+// parasite-power reservoir behavior, or full SPICE/SystemC-AMS waveforms from
+// the DS18B20 datasheet. Use it to catch read-slot and pull-up/capacitance
+// margin bugs, not as a complete electrical signoff model.
+
 module onewire_rc_line_model #(
     parameter real VPU_V = 3.3,
     parameter real VIL_MAX_V = 0.8,

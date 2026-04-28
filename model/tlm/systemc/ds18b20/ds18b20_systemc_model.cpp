@@ -1,5 +1,18 @@
 #include <systemc>
 
+// DS18B20 SystemC model scope:
+// This is an executable reference for the current FEB topology: one
+// DS18B20-compatible sensor on each independent 1-Wire line. It is not yet a
+// complete DS18B20 datasheet model. Implemented behavior is limited to the RC
+// pull-up threshold abstraction, reset/presence timing, write/read slots,
+// LSB-first byte transfer, Skip-ROM, Convert-T, Read-Scratchpad, Read-ROM,
+// fixed scratchpad defaults, and CRC-8 generation. Missing datasheet features
+// include Search-ROM, Match-ROM, Alarm-Search, Write/Copy Scratchpad,
+// Recall-E2, Read-Power-Supply, parasite-power busy/strong-pull-up rules,
+// EEPROM persistence, alarm threshold behavior, configurable 9/10/11/12-bit
+// conversion timing, full min/max timing rejection, multidrop arbitration, and
+// reset/error recovery during every transaction phase.
+
 #include <array>
 #include <cstdlib>
 #include <cmath>

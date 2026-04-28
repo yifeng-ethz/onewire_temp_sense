@@ -1,5 +1,15 @@
 `timescale 1ns/1ps
 
+// DS18B20 behavioral model scope:
+// This model matches the current FEB single-drop verification path, not the
+// full DS18B20 datasheet. Implemented behavior is reset/presence, basic
+// read/write slots, Skip-ROM, Convert-T, Read-Scratchpad, Read-ROM, fixed
+// scratchpad defaults, and CRC-8 generation. Missing features include
+// Search-ROM, Match-ROM, Alarm-Search, Write/Copy Scratchpad, Recall-E2,
+// Read-Power-Supply, parasite-power busy/strong-pull-up behavior, EEPROM
+// persistence, alarm thresholds, configurable 9/10/11/12-bit conversion timing,
+// multidrop arbitration, and exhaustive timing-window error handling.
+
 module ds18b20_1wire_model #(
     parameter longint unsigned ROM_CODE = 64'h2800000000000001,
     parameter int signed TEMP_C_X16 = 25 * 16,
