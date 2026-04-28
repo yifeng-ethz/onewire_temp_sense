@@ -1,0 +1,640 @@
+{
+  "timestamp": "2026-04-28T16:03:57",
+  "implemented_cases": [
+    "B003",
+    "B004",
+    "B005",
+    "B006",
+    "B007",
+    "B008",
+    "B009",
+    "B010",
+    "B011",
+    "B012",
+    "B013",
+    "B014",
+    "B015",
+    "B016",
+    "B017",
+    "B018",
+    "B019",
+    "B020",
+    "B021",
+    "B022",
+    "B023",
+    "B024",
+    "B025",
+    "B026",
+    "B027",
+    "B028",
+    "B029",
+    "B030",
+    "B031",
+    "B032",
+    "B033",
+    "B121",
+    "B122",
+    "B123",
+    "B124",
+    "B125",
+    "B001",
+    "B002",
+    "X001",
+    "X002",
+    "X003",
+    "X004",
+    "X005",
+    "X006",
+    "X007",
+    "X008",
+    "X009",
+    "X010",
+    "X011",
+    "X012",
+    "X121",
+    "X122",
+    "X123",
+    "X124",
+    "X125"
+  ],
+  "results": [
+    {
+      "case_id": "B003",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.capability_readback",
+        "BASIC.common_uid_meta_header",
+        "BASIC.csr_scratchpad"
+      ],
+      "log": "REPORT/run_20260428_160317/B003.log",
+      "report": "REPORT/B003.md"
+    },
+    {
+      "case_id": "B004",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B004.log",
+      "report": "REPORT/B004.md"
+    },
+    {
+      "case_id": "B005",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B005.log",
+      "report": "REPORT/B005.md"
+    },
+    {
+      "case_id": "B006",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B006.log",
+      "report": "REPORT/B006.md"
+    },
+    {
+      "case_id": "B007",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B007.log",
+      "report": "REPORT/B007.md"
+    },
+    {
+      "case_id": "B008",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B008.log",
+      "report": "REPORT/B008.md"
+    },
+    {
+      "case_id": "B009",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_commit_busy_irq"
+      ],
+      "log": "REPORT/run_20260428_160317/B009.log",
+      "report": "REPORT/B009.md"
+    },
+    {
+      "case_id": "B010",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_commit_busy_irq"
+      ],
+      "log": "REPORT/run_20260428_160317/B010.log",
+      "report": "REPORT/B010.md"
+    },
+    {
+      "case_id": "B011",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B011.log",
+      "report": "REPORT/B011.md"
+    },
+    {
+      "case_id": "B012",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B012.log",
+      "report": "REPORT/B012.md"
+    },
+    {
+      "case_id": "B013",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B013.log",
+      "report": "REPORT/B013.md"
+    },
+    {
+      "case_id": "B014",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B014.log",
+      "report": "REPORT/B014.md"
+    },
+    {
+      "case_id": "B015",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B015.log",
+      "report": "REPORT/B015.md"
+    },
+    {
+      "case_id": "B016",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B016.log",
+      "report": "REPORT/B016.md"
+    },
+    {
+      "case_id": "B017",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B017.log",
+      "report": "REPORT/B017.md"
+    },
+    {
+      "case_id": "B018",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B018.log",
+      "report": "REPORT/B018.md"
+    },
+    {
+      "case_id": "B019",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B019.log",
+      "report": "REPORT/B019.md"
+    },
+    {
+      "case_id": "B020",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_commit_busy_irq"
+      ],
+      "log": "REPORT/run_20260428_160317/B020.log",
+      "report": "REPORT/B020.md"
+    },
+    {
+      "case_id": "B021",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B021.log",
+      "report": "REPORT/B021.md"
+    },
+    {
+      "case_id": "B022",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_csr_descriptor_range"
+      ],
+      "log": "REPORT/run_20260428_160317/B022.log",
+      "report": "REPORT/B022.md"
+    },
+    {
+      "case_id": "B023",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_commit_busy_irq"
+      ],
+      "log": "REPORT/run_20260428_160317/B023.log",
+      "report": "REPORT/B023.md"
+    },
+    {
+      "case_id": "B024",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_commit_busy_irq"
+      ],
+      "log": "REPORT/run_20260428_160317/B024.log",
+      "report": "REPORT/B024.md"
+    },
+    {
+      "case_id": "B025",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B025.log",
+      "report": "REPORT/B025.md"
+    },
+    {
+      "case_id": "B026",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B026.log",
+      "report": "REPORT/B026.md"
+    },
+    {
+      "case_id": "B027",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B027.log",
+      "report": "REPORT/B027.md"
+    },
+    {
+      "case_id": "B028",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B028.log",
+      "report": "REPORT/B028.md"
+    },
+    {
+      "case_id": "B029",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B029.log",
+      "report": "REPORT/B029.md"
+    },
+    {
+      "case_id": "B030",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B030.log",
+      "report": "REPORT/B030.md"
+    },
+    {
+      "case_id": "B031",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B031.log",
+      "report": "REPORT/B031.md"
+    },
+    {
+      "case_id": "B032",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B032.log",
+      "report": "REPORT/B032.md"
+    },
+    {
+      "case_id": "B033",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.master_tx_engine_fsm"
+      ],
+      "log": "REPORT/run_20260428_160317/B033.log",
+      "report": "REPORT/B033.md"
+    },
+    {
+      "case_id": "B121",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.capability_readback"
+      ],
+      "log": "REPORT/run_20260428_160317/B121.log",
+      "report": "REPORT/B121.md"
+    },
+    {
+      "case_id": "B122",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.per_line_status_select"
+      ],
+      "log": "REPORT/run_20260428_160317/B122.log",
+      "report": "REPORT/B122.md"
+    },
+    {
+      "case_id": "B123",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.processor_go_per_line"
+      ],
+      "log": "REPORT/run_20260428_160317/B123.log",
+      "report": "REPORT/B123.md"
+    },
+    {
+      "case_id": "B124",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.temperature_float32_readback",
+        "BASIC.temperature_read_zero_until_valid"
+      ],
+      "log": "REPORT/run_20260428_160317/B124.log",
+      "report": "REPORT/B124.md"
+    },
+    {
+      "case_id": "B125",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.controller_init_err_readback"
+      ],
+      "log": "REPORT/run_20260428_160317/B125.log",
+      "report": "REPORT/B125.md"
+    },
+    {
+      "case_id": "B001",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.sample_valid_status",
+        "BASIC.temperature_float32_readback",
+        "BASIC.zero_temperature_guard"
+      ],
+      "log": "REPORT/run_20260428_160317/B001.log",
+      "report": "REPORT/B001.md"
+    },
+    {
+      "case_id": "B002",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "BASIC.per_line_status_select",
+        "BASIC.six_line_temperature_loop"
+      ],
+      "log": "REPORT/run_20260428_160317/B002.log",
+      "report": "REPORT/B002.md"
+    },
+    {
+      "case_id": "X001",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X001.log",
+      "report": "REPORT/X001.md"
+    },
+    {
+      "case_id": "X002",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X002.log",
+      "report": "REPORT/X002.md"
+    },
+    {
+      "case_id": "X003",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X003.log",
+      "report": "REPORT/X003.md"
+    },
+    {
+      "case_id": "X004",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X004.log",
+      "report": "REPORT/X004.md"
+    },
+    {
+      "case_id": "X005",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X005.log",
+      "report": "REPORT/X005.md"
+    },
+    {
+      "case_id": "X006",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X006.log",
+      "report": "REPORT/X006.md"
+    },
+    {
+      "case_id": "X007",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X007.log",
+      "report": "REPORT/X007.md"
+    },
+    {
+      "case_id": "X008",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X008.log",
+      "report": "REPORT/X008.md"
+    },
+    {
+      "case_id": "X009",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X009.log",
+      "report": "REPORT/X009.md"
+    },
+    {
+      "case_id": "X010",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X010.log",
+      "report": "REPORT/X010.md"
+    },
+    {
+      "case_id": "X011",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X011.log",
+      "report": "REPORT/X011.md"
+    },
+    {
+      "case_id": "X012",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.master_csr_illegal_access"
+      ],
+      "log": "REPORT/run_20260428_160317/X012.log",
+      "report": "REPORT/X012.md"
+    },
+    {
+      "case_id": "X121",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.read_only_csr_noop"
+      ],
+      "log": "REPORT/run_20260428_160317/X121.log",
+      "report": "REPORT/X121.md"
+    },
+    {
+      "case_id": "X122",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.temperature_write_noop"
+      ],
+      "log": "REPORT/run_20260428_160317/X122.log",
+      "report": "REPORT/X122.md"
+    },
+    {
+      "case_id": "X123",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.invalid_sel_line_status_zero"
+      ],
+      "log": "REPORT/run_20260428_160317/X123.log",
+      "report": "REPORT/X123.md"
+    },
+    {
+      "case_id": "X124",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.invalid_sel_line_go_suppressed"
+      ],
+      "log": "REPORT/run_20260428_160317/X124.log",
+      "report": "REPORT/X124.md"
+    },
+    {
+      "case_id": "X125",
+      "status": "PASS",
+      "returncode": 0,
+      "features": [
+        "ERROR.unmapped_temperature_slot_zero"
+      ],
+      "log": "REPORT/run_20260428_160317/X125.log",
+      "report": "REPORT/X125.md"
+    }
+  ],
+  "covered_features": [
+    "BASIC.capability_readback",
+    "BASIC.common_uid_meta_header",
+    "BASIC.controller_init_err_readback",
+    "BASIC.csr_scratchpad",
+    "BASIC.master_commit_busy_irq",
+    "BASIC.master_csr_descriptor_range",
+    "BASIC.master_tx_engine_fsm",
+    "BASIC.per_line_status_select",
+    "BASIC.processor_go_per_line",
+    "BASIC.sample_valid_status",
+    "BASIC.six_line_temperature_loop",
+    "BASIC.temperature_float32_readback",
+    "BASIC.temperature_read_zero_until_valid",
+    "BASIC.zero_temperature_guard",
+    "ERROR.invalid_sel_line_go_suppressed",
+    "ERROR.invalid_sel_line_status_zero",
+    "ERROR.master_csr_illegal_access",
+    "ERROR.read_only_csr_noop",
+    "ERROR.temperature_write_noop",
+    "ERROR.unmapped_temperature_slot_zero"
+  ]
+}

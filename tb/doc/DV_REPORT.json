@@ -1,0 +1,84 @@
+{
+  "dut": "onewire_master_controller",
+  "date": "2026-04-28",
+  "rtl_variant": "26.2.0 common-csr-header",
+  "status": "partial_unit_slice_pass_board_pending",
+  "csr_map": {
+    "UID": 0,
+    "META": 1,
+    "SCRATCH": 2,
+    "CAPABILITY": 3,
+    "STATUS": 4,
+    "SENSOR0_TEMP_F32": 5,
+    "SENSOR5_TEMP_F32": 10
+  },
+  "unit_evidence": {
+    "isolated_command": "make -C onewire_temp_sense/tb/uvm regress",
+    "continuous_command": "make -C onewire_temp_sense/tb/uvm run CASE=ALL_BUCKETS_FRAME MODE=all_buckets_frame",
+    "result": "PASS",
+    "implemented_cases": 55,
+    "covered_features": 20,
+    "checked_words": [
+      "0x4F574D43",
+      "0x00000000",
+      "0x41b88000",
+      "0x41c10000",
+      "0x41c98000",
+      "0x41d20000",
+      "0x41da8000"
+    ],
+    "sample_valid": "STATUS[26] asserted for enabled lines after scratchpad capture"
+  },
+  "buckets": {
+    "BASIC": {
+      "catalog_planned": 130,
+      "promoted": 38,
+      "evidenced": 38,
+      "features_passed": 14,
+      "features_total": 18
+    },
+    "EDGE": {
+      "catalog_planned": 130,
+      "promoted": 0,
+      "evidenced": 0,
+      "features_passed": 0,
+      "features_total": 8
+    },
+    "PROF": {
+      "catalog_planned": 130,
+      "promoted": 0,
+      "evidenced": 0,
+      "features_passed": 0,
+      "features_total": 8
+    },
+    "ERROR": {
+      "catalog_planned": 130,
+      "promoted": 17,
+      "evidenced": 17,
+      "features_passed": 6,
+      "features_total": 10
+    }
+  },
+  "signoff_runs": [
+    {
+      "run_id": "onewire_named_isolated_slice",
+      "kind": "isolated",
+      "status": "PASS",
+      "txns": 55,
+      "evidence": "../REPORT/onewire_regression_summary.json"
+    },
+    {
+      "run_id": "ow_all_buckets_frame",
+      "kind": "all_buckets_frame",
+      "status": "PASS",
+      "txns": 55,
+      "evidence": "../REPORT/ALL_BUCKETS_FRAME.md"
+    }
+  ],
+  "non_claims": [
+    "No full DV bucket is signed off yet.",
+    "Serial-number Read-ROM probing is planned after temperature conversion and board correlation are clean.",
+    "The crc_err bit resets cleanly, but the scratchpad CRC checker is not wired into the controller datapath.",
+    "UCDB code coverage is not enabled yet."
+  ]
+}
