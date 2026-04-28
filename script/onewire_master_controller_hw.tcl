@@ -290,7 +290,7 @@ add_display_item "Debug" DEBUG_LV PARAMETER
 add_display_item "" "Identity" GROUP ""
 add_display_item "Identity" "Versioning" GROUP ""
 add_html_text "Versioning" "Delivered Profile" "<html><b>OneWire Master Controller</b><br>Version $VERSION_STRING<br>Date $VERSION_DATE_DEFAULT_CONST<br>FEB profile: six independent DS18B20 DQ lines, one sensor per line.<br><br><b>Runtime visibility</b><br>Software can blind-scan the CSR window through <b>UID</b> at word <b>0</b> and the <b>META</b> mux at word <b>1</b>.</html>"
-add_html_text "Versioning" "Common Header" "<html><b>Common identity header</b><br>Word <b>0</b> is <b>UID</b>.<br>Word <b>1</b> is <b>META</b>: write <b>0</b>=VERSION, <b>1</b>=DATE, <b>2</b>=GIT, <b>3</b>=INSTANCE_ID.<br><br><b>VERSION encoding</b><br>VERSION[31:24] = MAJOR, VERSION[23:16] = MINOR, VERSION[15:12] = PATCH, VERSION[11:0] = BUILD.</html>"
+add_html_text "Versioning" "Common Header" "<html><b>Common identity header</b><br>Word <b>0</b> is <b>UID</b>.<br>Word <b>1</b> is <b>META</b>: write <b>0</b>=VERSION, <b>1</b>=DATE, <b>2</b>=GIT, <b>3</b>=INSTANCE_ID.<br><br><b>VERSION encoding</b><br>VERSION bit 31..24 = MAJOR, bit 23..16 = MINOR, bit 15..12 = PATCH, bit 11..0 = BUILD.</html>"
 add_display_item "Versioning" IP_UID PARAMETER
 add_display_item "Versioning" VERSION_MAJOR PARAMETER
 add_display_item "Versioning" VERSION_MINOR PARAMETER
@@ -304,7 +304,7 @@ add_display_item "" "Interfaces" GROUP ""
 add_html_text "Interfaces" "Interface Summary" "<html><table border=\"1\" cellpadding=\"3\"><tr><th>Interface</th><th>Role</th><th>Description</th></tr><tr><td>ctrl</td><td>Avalon-MM master</td><td>Issues commands to the onewire_master link layer.</td></tr><tr><td>csr</td><td>Avalon-MM slave</td><td>Host control, status, and temperature readback aperture.</td></tr><tr><td>tx</td><td>Avalon-ST source</td><td>Command bytes sent to the link layer.</td></tr><tr><td>rx</td><td>Avalon-ST sink</td><td>Scratchpad bytes returned by the link layer.</td></tr><tr><td>complete</td><td>Interrupt receiver</td><td>Transaction completion IRQ from the link layer.</td></tr></table></html>"
 
 add_display_item "" "Register Map" GROUP ""
-add_html_text "Register Map" "CSR Words" "<html><table border=\"1\" cellpadding=\"3\"><tr><th>Word</th><th>Name</th><th>Access</th><th>Description</th></tr><tr><td>0</td><td>UID</td><td>RO</td><td>Software-visible IP identifier. Default is ASCII <b>OWMC</b>.</td></tr><tr><td>1</td><td>META</td><td>RW/RO</td><td>Read-multiplexed metadata word. Write <b>0</b>=VERSION, <b>1</b>=DATE, <b>2</b>=GIT, <b>3</b>=INSTANCE_ID. VERSION is packed as MAJOR[31:24], MINOR[23:16], PATCH[15:12], BUILD[11:0].</td></tr><tr><td>2</td><td>SCRATCH</td><td>RW</td><td>Host scratchpad/readback word for software liveness tests.</td></tr><tr><td>3</td><td>CAPABILITY</td><td>RO</td><td>bits 15:0 n_dq_lines, bits 31:16 n_sensors reserved zero until the Read-ROM probe is implemented.</td></tr><tr><td>4</td><td>STATUS</td><td>RW</td><td>bits 15:0 sel_line, bit 16 processor_go, bit 24 crc_err, bit 25 init_err, bit 26 sample_valid. Future Read-ROM status bits must live above bit 26.</td></tr><tr><td>5..10</td><td>SENSORn_TEMP_F32</td><td>RO</td><td>IEEE-754 float32 temperature for DQ line n. Reads zero until sample_valid is set for that line.</td></tr></table></html>"
+add_html_text "Register Map" "CSR Words" "<html><table border=\"1\" cellpadding=\"3\"><tr><th>Word</th><th>Name</th><th>Access</th><th>Description</th></tr><tr><td>0</td><td>UID</td><td>RO</td><td>Software-visible IP identifier. Default is ASCII <b>OWMC</b>.</td></tr><tr><td>1</td><td>META</td><td>RW/RO</td><td>Read-multiplexed metadata word. Write <b>0</b>=VERSION, <b>1</b>=DATE, <b>2</b>=GIT, <b>3</b>=INSTANCE_ID. VERSION is packed as MAJOR bits 31..24, MINOR bits 23..16, PATCH bits 15..12, BUILD bits 11..0.</td></tr><tr><td>2</td><td>SCRATCH</td><td>RW</td><td>Host scratchpad/readback word for software liveness tests.</td></tr><tr><td>3</td><td>CAPABILITY</td><td>RO</td><td>bits 15:0 n_dq_lines, bits 31:16 n_sensors reserved zero until the Read-ROM probe is implemented.</td></tr><tr><td>4</td><td>STATUS</td><td>RW</td><td>bits 15:0 sel_line, bit 16 processor_go, bit 24 crc_err, bit 25 init_err, bit 26 sample_valid. Future Read-ROM status bits must live above bit 26.</td></tr><tr><td>5..10</td><td>SENSORn_TEMP_F32</td><td>RO</td><td>IEEE-754 float32 temperature for DQ line n. Reads zero until sample_valid is set for that line.</td></tr></table></html>"
 
 
 
@@ -497,7 +497,6 @@ proc myvalidate {} {
 	}
 	return -code ok
 }
-
 
 
 
