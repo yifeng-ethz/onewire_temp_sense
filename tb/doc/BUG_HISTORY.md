@@ -37,6 +37,7 @@ Historical formal note:
 | [BUG-001-R](#bug-001-r-zero-scratchpad-converts-to-10-c) | R | soft error | `common (control-path routine)` | fixed in unit sim; board pending | Phase-5 environment readback on `2026-04-28` | `pending` | Zeroed scratchpad bytes converted to IEEE-754 `1.0`; RTL now reports zero for raw zero and exposes `sample_valid`. |
 | [BUG-002-H](#bug-002-h-ds18b20-model-skipped-command-slots-after-master-written-one-bits) | H | non-datapath-refactor | `directed-only (new unit harness)` | fixed | OneWire smoke tb on `2026-04-28` | `pending` | DS18B20 model waited for a posedge that already happened on write-1 slots, causing command decode drift. |
 | [BUG-003-R](#bug-003-r-controller-crc_err-status-bit-was-uninitialized) | R | soft error | `common (control-path routine)` | fixed in unit sim; board pending | `B001` after 4-state checker tightening on `2026-04-28` | `pending` | Controller `STATUS[24] crc_err` was declared but not reset/driven, so stricter DV saw `X` on healthy reads. |
+| [BUG-004-R](#bug-004-r-125-mhz-odd-divider-never-advanced) | R | hard stuck error | `common (FEB 125 MHz control-path routine)` | fixed in unit regression; Qsys/board pending | Phase-5 OneWire retry60 board evidence on `2026-04-28` | `pending` | Shared 1 us divider stalled for odd ratios, so FEB 125 MHz OneWire timers never ticked and no line reached sample_valid. |
 
 ## 2026-04-28
 
@@ -148,5 +149,36 @@ Historical formal note:
 - Runtime / coverage context:
   - this was found by using the bucket case as functional feature evidence
     instead of accepting the older smoke log
+- Commit:
+  - pending
+
+### BUG-004-R: 125 MHz odd divider never advanced
+- First seen in:
+  - Phase-5 generated FEB image on `2026-04-28`
+  - `firmware_builds/systems/system_20260427_testplanphase5/reports/phase5_environment_20260428_onewire_newimage_retry60.json`
+- Symptom:
+  - controller UID, CAPABILITY, and STATUS CSR reads were live
+  - writes set `processor_go=1` for all six lines and read back clean `crc_err=0`
+  - after a 60 second settle, every line still had `sample_valid=0` and temperature word `0x00000000`
+- Root cause:
+  - `pseudo_clock_down_convertor` odd-divider branch did not increment `fast_counter`
+  - FEB generated OneWire uses `REF_CLOCK_RATE / 1_000_000 = 125`, so both the master timing and controller slow timer remained stalled
+- Fix status:
+  - state:
+    - fixed in unit regression; generated Qsys and on-board reflash/readback pending
+  - mechanism:
+    - odd-divider branch now advances and wraps `fast_counter`
+    - `tick` is driven low by default and pulses on the pseudo-clock rising edge
+    - reset now initializes `tick` in both even and odd branches
+  - before_fix_outcome:
+    - `phase5_environment_20260428_onewire_newimage_retry60.json` shows all six OneWire lines with `sample_valid=0`
+  - after_fix_outcome:
+    - `make -C onewire_temp_sense/tb/uvm regress` passes through `B131`, with `CLK_DOWN_FACTOR=125` and `CLK_DOWN_FACTOR=124` each producing at least three periodic ticks; evidence log is `tb/REPORT/run_20260428_191021/B131.log`
+  - potential_hazard:
+    - low for the divider itself; on-board evidence is still needed to catch electrical presence, pull-up, or real-sensor issues after timers start
+  - Claude Opus 4.7 xhigh review decision:
+    - pending / not run
+- Runtime / coverage context:
+  - `B131` was added because full controller smoke runs at 1 MHz and intentionally bypasses this divider, while the FEB build uses 125 MHz
 - Commit:
   - pending

@@ -4,7 +4,7 @@
   <vendorID>MU3E</vendorID>
   <name>MU3E_ONEWIRE_MASTER_CONTROLLER</name>
   <series>MU3E_FPGA_IP</series>
-  <version>26.2.0</version>
+  <version>26.2.1</version>
   <description>CMSIS-SVD description of the onewire_master_controller CSR aperture. BaseAddress is 0 because this file describes the relative CSR aperture of the IP; system integration supplies the live slave base address.</description>
   <addressUnitBits>8</addressUnitBits>
   <width>32</width>
@@ -55,7 +55,7 @@
             </field>
             <field>
               <name>payload</name>
-              <description>Readback payload for the selected metadata page. VERSION page encoding is MAJOR[31:24], MINOR[23:16], PATCH[15:12], BUILD[11:0].</description>
+              <description>Readback payload for the selected metadata page. VERSION page encoding is MAJOR bits 31..24, MINOR bits 23..16, PATCH bits 15..12, BUILD bits 11..0.</description>
               <bitOffset>0</bitOffset>
               <bitWidth>32</bitWidth>
               <access>read-only</access>
@@ -92,7 +92,7 @@
             </field>
             <field>
               <name>n_sensors</name>
-              <description>Reserved for future successful Read-ROM probe count; currently reads zero.</description>
+              <description>Reserved for future sensor-count reporting; currently reads zero.</description>
               <bitOffset>16</bitOffset>
               <bitWidth>16</bitWidth>
               <access>read-only</access>
@@ -128,7 +128,7 @@
             </field>
             <field>
               <name>crc_err</name>
-              <description>CRC error sticky flag for the selected line. Current RTL declaration is present; final CRC checker hookup remains a planned DV feature.</description>
+              <description>CRC error sticky flag for the selected line.</description>
               <bitOffset>24</bitOffset>
               <bitWidth>1</bitWidth>
               <access>read-only</access>
@@ -149,7 +149,7 @@
             </field>
             <field>
               <name>reserved1</name>
-              <description>Reserved for planned Read-ROM probe status, read as zero in the current RTL.</description>
+              <description>Reserved, read as zero.</description>
               <bitOffset>27</bitOffset>
               <bitWidth>5</bitWidth>
               <access>read-only</access>
@@ -161,42 +161,90 @@
           <description>IEEE-754 float32 temperature reading for sensor 0.</description>
           <addressOffset>0x14</addressOffset>
           <access>read-only</access>
-          <fields><field><name>value</name><description>Raw float32 temperature sample for sensor 0.</description><bitOffset>0</bitOffset><bitWidth>32</bitWidth><access>read-only</access></field></fields>
+          <fields>
+            <field>
+              <name>value</name>
+              <description>Raw float32 temperature sample for sensor 0.</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>32</bitWidth>
+              <access>read-only</access>
+            </field>
+          </fields>
         </register>
         <register>
           <name>SENSOR1_TEMP_F32</name>
           <description>IEEE-754 float32 temperature reading for sensor 1.</description>
           <addressOffset>0x18</addressOffset>
           <access>read-only</access>
-          <fields><field><name>value</name><description>Raw float32 temperature sample for sensor 1.</description><bitOffset>0</bitOffset><bitWidth>32</bitWidth><access>read-only</access></field></fields>
+          <fields>
+            <field>
+              <name>value</name>
+              <description>Raw float32 temperature sample for sensor 1.</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>32</bitWidth>
+              <access>read-only</access>
+            </field>
+          </fields>
         </register>
         <register>
           <name>SENSOR2_TEMP_F32</name>
           <description>IEEE-754 float32 temperature reading for sensor 2.</description>
           <addressOffset>0x1C</addressOffset>
           <access>read-only</access>
-          <fields><field><name>value</name><description>Raw float32 temperature sample for sensor 2.</description><bitOffset>0</bitOffset><bitWidth>32</bitWidth><access>read-only</access></field></fields>
+          <fields>
+            <field>
+              <name>value</name>
+              <description>Raw float32 temperature sample for sensor 2.</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>32</bitWidth>
+              <access>read-only</access>
+            </field>
+          </fields>
         </register>
         <register>
           <name>SENSOR3_TEMP_F32</name>
           <description>IEEE-754 float32 temperature reading for sensor 3.</description>
           <addressOffset>0x20</addressOffset>
           <access>read-only</access>
-          <fields><field><name>value</name><description>Raw float32 temperature sample for sensor 3.</description><bitOffset>0</bitOffset><bitWidth>32</bitWidth><access>read-only</access></field></fields>
+          <fields>
+            <field>
+              <name>value</name>
+              <description>Raw float32 temperature sample for sensor 3.</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>32</bitWidth>
+              <access>read-only</access>
+            </field>
+          </fields>
         </register>
         <register>
           <name>SENSOR4_TEMP_F32</name>
           <description>IEEE-754 float32 temperature reading for sensor 4.</description>
           <addressOffset>0x24</addressOffset>
           <access>read-only</access>
-          <fields><field><name>value</name><description>Raw float32 temperature sample for sensor 4.</description><bitOffset>0</bitOffset><bitWidth>32</bitWidth><access>read-only</access></field></fields>
+          <fields>
+            <field>
+              <name>value</name>
+              <description>Raw float32 temperature sample for sensor 4.</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>32</bitWidth>
+              <access>read-only</access>
+            </field>
+          </fields>
         </register>
         <register>
           <name>SENSOR5_TEMP_F32</name>
           <description>IEEE-754 float32 temperature reading for sensor 5.</description>
           <addressOffset>0x28</addressOffset>
           <access>read-only</access>
-          <fields><field><name>value</name><description>Raw float32 temperature sample for sensor 5.</description><bitOffset>0</bitOffset><bitWidth>32</bitWidth><access>read-only</access></field></fields>
+          <fields>
+            <field>
+              <name>value</name>
+              <description>Raw float32 temperature sample for sensor 5.</description>
+              <bitOffset>0</bitOffset>
+              <bitWidth>32</bitWidth>
+              <access>read-only</access>
+            </field>
+          </fields>
         </register>
       </registers>
     </peripheral>

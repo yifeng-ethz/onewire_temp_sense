@@ -1,0 +1,36 @@
+make[1]: Entering directory '/home/yifeng/packages/mu3e_ip_dev/mu3e-ip-cores/onewire_temp_sense/tb/uvm'
+/data1/questaone_sim/questasim/linux_x86_64/vsim -c -suppress 19 -suppress 3009 -work work tb_pseudo_clock_down_convertor -do "run -all; quit -f"
+Reading pref.tcl
+
+# 2026.1_1
+
+# ** Note: (vsim-220) '/data1/questaone_sim/questasim/modelsim.ini' is used as the ini file.
+# vsim -c -suppress 19 -suppress 3009 -work work tb_pseudo_clock_down_convertor -do "run -all; quit -f" 
+# Start time: 19:10:47 on Apr 28,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# //  Questa Sim-64
+# //  Version 2026.1_1 linux_x86_64 Mar  2 2026
+# //
+# // Unpublished work. Copyright 2026 Siemens
+# //
+# // This material contains trade secrets or otherwise confidential information
+# // owned by Siemens Industry Software Inc. or its affiliates (collectively,
+# // "SISW"), or its licensors. Access to and use of this information is strictly
+# // limited as set forth in the Customer's applicable agreements with SISW.
+# //
+# // This material may not be copied, distributed, or otherwise disclosed outside
+# // of the Customer's facilities without the express written permission of SISW,
+# // and may not be used in any way not expressly authorized by SISW.
+# //
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading std.env(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_pseudo_clock_down_convertor(tb)#1
+# run -all
+# ** Note: PSEUDO_CLOCK_DOWN_CONVERTOR_PASS
+#    Time: 3404 ns  Iteration: 1  Instance: /tb_pseudo_clock_down_convertor
+# End time: 19:10:47 on Apr 28,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+make[1]: Leaving directory '/home/yifeng/packages/mu3e_ip_dev/mu3e-ip-cores/onewire_temp_sense/tb/uvm'

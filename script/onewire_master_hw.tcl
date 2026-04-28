@@ -34,7 +34,7 @@ Usage:
 </ul>
 </html>"
 set_module_property NAME onewire_master
-set_module_property VERSION 24.1.423
+set_module_property VERSION 26.2.1.0428
 set_module_property INTERNAL false
 set_module_property OPAQUE_ADDRESS_MAP true
 set_module_property GROUP "Mu3e Control Plane/Modules"

@@ -2,8 +2,8 @@
 
 **Companion docs:** [DV_PLAN.md](DV_PLAN.md), [DV_HARNESS.md](DV_HARNESS.md), [DV_EDGE.md](DV_EDGE.md), [DV_PROF.md](DV_PROF.md), [DV_ERROR.md](DV_ERROR.md), [DV_CROSS.md](DV_CROSS.md), [DV_REPORT.md](DV_REPORT.md), [BUG_HISTORY.md](BUG_HISTORY.md)
 **Parent:** [DV_PLAN.md](DV_PLAN.md)
-**ID Range:** `B001-B130`
-**Total:** 130 cases (38 implemented / 0 waived)
+**ID Range:** `B001-B131`
+**Total:** 131 cases (39 implemented / 0 waived)
 
 This document covers the bring-up and protocol-correctness sanity for the six-line FEB DS18B20 controller path: master link layer, controller transaction layer, ticket-lock arbiter, format convertor, sample_valid guard, and the planned single-device Read-ROM serial-number probe. Every case here must pass before EDGE / PROF / ERROR cases are meaningful.
 
@@ -37,6 +37,7 @@ Current Case     : `<n>/<n>` (implemented/total), or `implemented` / `waived` / 
 | Format Convertor Happy Path (FMT) | 7 | B114-B120 | raw S(5).F(11) -> IEEE-754 float32 across the DS18B20 spec range, zero-fraction guard | 0/7 |
 | Controller CSR Identity (CSRC) | 5 | B121-B125 | controller CSR identity header (CAPABILITY, sel_line, processor_go, init_err, per-line SENSOR_TEMP) | 5/5 |
 | Read-ROM Serial-Number Probe (PROBE) | 5 | B126-B130 | planned single-device Read-ROM serial probe per line, ROM shadow stability, n_sensors update | 0/5 |
+| Common Microsecond Divider (DIV) | 1 | B131-B131 | REF_CLOCK_RATE/1 MHz divider emits ticks for both odd and even ratios, including FEB 125 MHz / 1 MHz | 1/1 |
 
 ---
 
@@ -285,3 +286,13 @@ These cases prove the planned single-device Read-ROM serial-number probe (RTL fi
 | B128 | D | NEW Read-ROM probe: idempotent re-probe on same line keeps shadow stable | 1 | probe sel_line=2 twice back-to-back; CSR read SENSOR_ROM_LO/HI and STATUS between the two probes | probe sel_line=2 twice back-to-back; selected-line ROM shadow unchanged across both probes; probe_valid stays 1; probe_crc_err stays 0; n_sensors unchanged | TBD |
 | B129 | D | NEW Read-ROM probe: ROM shadow on line 0 stable across temperature loop activity on lines 1..5 | 1 | probe sel_line=0; then enable processor_go on lines 1..5 for one full 850 ms cycle; CSR read SENSOR_ROM_LO/HI with sel_line=0 again | probe sel_line=0; then enable processor_go on lines 1..5 for one full 850 ms cycle; selected-line SENSOR_ROM_LO/HI unchanged after selecting line 0 again; probe_valid(0) stays 1 | TBD |
 | B130 | D | NEW Read-ROM probe: CAPABILITY n_sensors updates after multi-line probe scan | 1 | probe lines 0,2,4 only and read CAPABILITY[31:16]; then probe lines 1,3,5 and read CAPABILITY[31:16] again | probe lines 0,2,4 only; CAPABILITY[31:16] reads 3; probe lines 1,3,5 next; CAPABILITY[31:16] reads 6; per-line probe_valid bits set independently | TBD |
+
+---
+
+## 14. Common Microsecond Divider (DIV) -- 1 case
+
+This case proves the shared `pseudo_clock_down_convertor` used by both the master link layer and controller slow timer. It specifically covers the FEB profile where `REF_CLOCK_RATE / 1 MHz = 125`, because the full controller smoke intentionally uses a 1 MHz simulation clock and therefore bypasses the divider.
+
+| ID | Method | Scenario | Iter | Stimulus | Pass Criteria | Function Reference |
+|---|---|---|---|---|---|---|
+| B131 | D | common divider emits periodic ticks for odd 125:1 and even 124:1 ratios | 1 | instantiate `pseudo_clock_down_convertor` with `CLK_DOWN_FACTOR=125` and `CLK_DOWN_FACTOR=124`; release reset; observe 420 input clock cycles | odd divider produces at least three `tick` pulses spaced exactly 125 input cycles apart; even divider produces at least three `tick` pulses spaced exactly 124 input cycles apart; first tick lands near the pseudo-clock rising edge | TBD |

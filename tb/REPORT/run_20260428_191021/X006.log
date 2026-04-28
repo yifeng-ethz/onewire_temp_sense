@@ -1,0 +1,90 @@
+make[1]: Entering directory '/home/yifeng/packages/mu3e_ip_dev/mu3e-ip-cores/onewire_temp_sense/tb/uvm'
+/data1/questaone_sim/questasim/linux_x86_64/vsim -c -suppress 19 -suppress 3009 -work work tb_onewire_controller_smoke +OW_CASE=X006 +OW_MODE=isolated -do "run -all; quit -f"
+Reading pref.tcl
+
+# 2026.1_1
+
+# ** Note: (vsim-220) '/data1/questaone_sim/questasim/modelsim.ini' is used as the ini file.
+# vsim -c -suppress 19 -suppress 3009 -work work tb_onewire_controller_smoke "+OW_CASE=X006" "+OW_MODE=isolated" -do "run -all; quit -f" 
+# Start time: 19:10:56 on Apr 28,2026
+# ** Note: (vsim-8009) Loading existing optimized design _opt
+# //  Questa Sim-64
+# //  Version 2026.1_1 linux_x86_64 Mar  2 2026
+# //
+# // Unpublished work. Copyright 2026 Siemens
+# //
+# // This material contains trade secrets or otherwise confidential information
+# // owned by Siemens Industry Software Inc. or its affiliates (collectively,
+# // "SISW"), or its licensors. Access to and use of this information is strictly
+# // limited as set forth in the Customer's applicable agreements with SISW.
+# //
+# // This material may not be copied, distributed, or otherwise disclosed outside
+# // of the Customer's facilities without the express written permission of SISW,
+# // and may not be used in any way not expressly authorized by SISW.
+# //
+# Loading sv_std.std
+# Loading work.tb_onewire_controller_smoke(fast)
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading ieee.math_real(body)
+# Loading synopsys.attributes
+# Loading ieee.std_logic_misc(body)
+# Loading work.onewire_master(rtl)#1
+# Loading work.pseudo_clock_down_convertor(rtl)#1
+# Loading work.onewire_master_controller(rtl)#1
+# Loading work.onewire_master(rtl)#2
+# run -all
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master_no_parasitic
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master_no_parasitic
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master_no_parasitic/e_sensor_slow_clock
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master_direct
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master_direct
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master_direct/e_sensor_slow_clock
+# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+#    Time: 0 ps  Iteration: 0  Region: /tb_onewire_controller_smoke/u_controller/gen_format_convertor(5)
+# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+#    Time: 0 ps  Iteration: 0  Region: /tb_onewire_controller_smoke/u_controller/gen_format_convertor(4)
+# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+#    Time: 0 ps  Iteration: 0  Region: /tb_onewire_controller_smoke/u_controller/gen_format_convertor(3)
+# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+#    Time: 0 ps  Iteration: 0  Region: /tb_onewire_controller_smoke/u_controller/gen_format_convertor(2)
+# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+#    Time: 0 ps  Iteration: 0  Region: /tb_onewire_controller_smoke/u_controller/gen_format_convertor(1)
+# ** Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+#    Time: 0 ps  Iteration: 0  Region: /tb_onewire_controller_smoke/u_controller/gen_format_convertor(0)
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_controller/gen_timer(5)/e_sensor_slow_clock
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_controller/gen_timer(4)/e_sensor_slow_clock
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_controller/gen_timer(3)/e_sensor_slow_clock
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_controller/gen_timer(2)/e_sensor_slow_clock
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_controller/gen_timer(1)/e_sensor_slow_clock
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_controller/gen_timer(0)/e_sensor_slow_clock
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master
+# ** Warning: NUMERIC_STD.TO_INTEGER: metavalue detected, returning 0
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master
+# ** Warning: CLK_DOWN_FACTOR is set to 1. The output tick is forced high.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_onewire_controller_smoke/u_master/e_sensor_slow_clock
+# OW_RUN_BEGIN case=X006 mode=isolated
+# OW_CASE_BEGIN X006
+# OW_FEATURE_PASS ERROR.master_csr_illegal_access
+# OW_CASE_PASS X006
+# ONEWIRE_CONTROLLER_SMOKE_PASS
+# ** Note: $finish    : tb_onewire_controller_smoke.sv(869)
+#    Time: 818501 ns  Iteration: 0  Instance: /tb_onewire_controller_smoke
+# End time: 19:10:56 on Apr 28,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 21
+make[1]: Leaving directory '/home/yifeng/packages/mu3e_ip_dev/mu3e-ip-cores/onewire_temp_sense/tb/uvm'

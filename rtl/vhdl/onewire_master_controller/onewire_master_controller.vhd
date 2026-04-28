@@ -1,9 +1,9 @@
 -- ------------------------------------------------------------------------------------------------------------
 -- IP Name:             onewire_master_controller
 -- Author:              Yifeng Wang (yifenwan@phys.ethz.ch)
--- Revision:            26.2.0
+-- Revision:            26.2.1
 -- Date:                20260428
--- Change:              Add common UID/META CSR header and keep sample-valid/zero-temperature guard.
+-- Change:              Add common UID/META CSR header, sample-valid guard, and 125 MHz odd-divider repair.
 -- Description:         Host transaction layer issues by process data from/into the onewire master IP.
 --						It wraps around the link layer by automatically perform functional commands on a specific 1-Wire device.
 -- Usage:               
@@ -56,7 +56,7 @@ generic (
 	IP_UID					: natural := 16#4F574D43#; -- ASCII "OWMC"
 	VERSION_MAJOR			: natural := 26;
 	VERSION_MINOR			: natural := 2;
-	VERSION_PATCH			: natural := 0;
+	VERSION_PATCH			: natural := 1;
 	BUILD					: natural := 428;
 	VERSION_DATE			: natural := 20260428;
 	VERSION_GIT				: natural := 0;
@@ -308,12 +308,12 @@ begin
 		)
 		port map ( 
 			-- input fast clock and reset interface
-			i_clk 			=> csi_clock_clk, -- input clock
-			i_reset_n 		=> not rsi_reset_reset,	-- input reset
+			clk 			=> csi_clock_clk, -- input clock
+			reset_n 		=> not rsi_reset_reset,	-- input reset
 			-- pseudo slow clock
-			o_clk		 	=> open, -- so far not used, can be slow down the overall state machine to release more timing slack
+			pseudo_clk	 	=> open, -- so far not used, can be slow down the overall state machine to release more timing slack
 			-- slow tick (active for one fast cycle at the rising edge of the slow clock)
-			o_tick			=> slow_tick(i)
+			tick			=> slow_tick(i)
 		);
 	
 		proc_slow_timer : process(rsi_reset_reset,csi_clock_clk)

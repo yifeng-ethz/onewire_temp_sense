@@ -24,7 +24,7 @@ CASE ?= OW_SMOKE
 MODE ?= isolated
 VSIM_PLUSARGS ?= +OW_CASE=$(CASE) +OW_MODE=$(MODE)
 
-.PHONY: smoke compile run regress clean
+.PHONY: smoke compile run run_divider regress clean
 
 smoke: compile run
 
@@ -44,11 +44,15 @@ compile: $(WORK) $(ALTERA_MF)
 	$(VCOM) -2008 -work work $(RTL_DIR)/vhdl/onewire_master/onewire_master.vhd
 	$(VCOM) -2008 -work work $(RTL_DIR)/vhdl/onewire_master_controller/onewire_master_controller.vhd
 	$(VLOG) -sv -work work harness/models/ds18b20/onewire_rc_line_model.sv harness/models/ds18b20/ds18b20_1wire_model.sv tb_onewire_controller_smoke.sv
+	$(VCOM) -2008 -work work tb_pseudo_clock_down_convertor.vhd
 
 run:
 	$(VSIM) -c -suppress 19 -suppress 3009 -work work $(TB_TOP) $(VSIM_PLUSARGS) -do "run -all; quit -f"
 
-regress: compile
+run_divider:
+	$(VSIM) -c -suppress 19 -suppress 3009 -work work tb_pseudo_clock_down_convertor -do "run -all; quit -f"
+
+regress: compile run_divider
 	python3 script/run_onewire_regression.py --skip-compile
 
 clean:

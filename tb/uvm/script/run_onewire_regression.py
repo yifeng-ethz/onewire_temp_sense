@@ -57,6 +57,7 @@ IMPLEMENTED_CASES = [
     "B123",
     "B124",
     "B125",
+    "B131",
     "B001",
     "B002",
     "X001",
@@ -131,6 +132,7 @@ CASE_FEATURES = {
         "BASIC.temperature_float32_readback",
     ],
     "B125": ["BASIC.controller_init_err_readback"],
+    "B131": ["BASIC.microsecond_divider_odd_even"],
     "X001": ["ERROR.master_csr_illegal_access"],
     "X002": ["ERROR.master_csr_illegal_access"],
     "X003": ["ERROR.master_csr_illegal_access"],
@@ -171,10 +173,15 @@ def parse_features(log_text: str) -> list[str]:
 
 def write_case_report(case_id: str, proc: subprocess.CompletedProcess[str], log_path: Path) -> dict[str, object]:
     log_text = log_path.read_text(encoding="utf-8", errors="replace")
-    passed = proc.returncode == 0 and f"OW_CASE_PASS {case_id}" in log_text
+    divider_case = case_id == "B131"
+    pass_token = "PSEUDO_CLOCK_DOWN_CONVERTOR_PASS" if divider_case else f"OW_CASE_PASS {case_id}"
+    passed = proc.returncode == 0 and pass_token in log_text
     features = parse_features(log_text)
+    if passed and not features:
+        features = CASE_FEATURES.get(case_id, [])
     report_path = REPORT_DIR / f"{case_id}.md"
     status = "PASS" if passed else "FAIL"
+    command = "make run_divider" if divider_case else f"make run CASE={case_id} MODE=isolated"
     report_path.write_text(
         "\n".join(
             [
@@ -183,7 +190,7 @@ def write_case_report(case_id: str, proc: subprocess.CompletedProcess[str], log_
                 f"| field | value |",
                 f"|---|---|",
                 f"| status | {status} |",
-                f"| command | `make run CASE={case_id} MODE=isolated` |",
+                f"| command | `{command}` |",
                 f"| log | `{log_path.relative_to(TB_DIR)}` |",
                 f"| features covered | {', '.join(features) if features else 'none'} |",
                 "",
@@ -230,7 +237,10 @@ def main() -> int:
             print(f"unknown or unimplemented case: {case_id}", file=sys.stderr)
             return 2
         log_path = run_dir / f"{case_id}.log"
-        proc = run_cmd(["make", "run", f"CASE={case_id}", "MODE=isolated"], log_path)
+        if case_id == "B131":
+            proc = run_cmd(["make", "run_divider"], log_path)
+        else:
+            proc = run_cmd(["make", "run", f"CASE={case_id}", "MODE=isolated"], log_path)
         result = write_case_report(case_id, proc, log_path)
         results.append(result)
         print(f"{case_id}: {result['status']}")

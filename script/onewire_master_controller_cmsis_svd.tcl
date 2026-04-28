@@ -8,7 +8,32 @@ namespace eval ::mu3e::cmsis::spec {}
 
 proc ::mu3e::cmsis::spec::build_device {} {
     set registers [list \
-        [::mu3e::cmsis::svd::register CAPABILITY 0x00 \
+        [::mu3e::cmsis::svd::register UID 0x00 \
+            -description {Common Mu3e software-visible IP identifier. Default is ASCII OWMC.} \
+            -access read-only \
+            -resetValue 0x4F574D43 \
+            -fields [list \
+                [::mu3e::cmsis::svd::field ip_uid 0 32 \
+                    -description {HDL parameter IP_UID.} \
+                    -access read-only]]] \
+        [::mu3e::cmsis::svd::register META 0x04 \
+            -description {Common read-multiplexed metadata word. Writes select the readback page: 0 VERSION, 1 VERSION_DATE, 2 VERSION_GIT, 3 INSTANCE_ID.} \
+            -access read-write \
+            -fields [list \
+                [::mu3e::cmsis::svd::field selector 0 2 \
+                    -description {Write page selector. 0 VERSION, 1 VERSION_DATE, 2 VERSION_GIT, 3 INSTANCE_ID.} \
+                    -access read-write] \
+                [::mu3e::cmsis::svd::field payload 0 32 \
+                    -description {Readback payload for the selected metadata page. VERSION page encoding is MAJOR bits 31..24, MINOR bits 23..16, PATCH bits 15..12, BUILD bits 11..0.} \
+                    -access read-only]]] \
+        [::mu3e::cmsis::svd::register SCRATCH 0x08 \
+            -description {Software scratch/readback word for CSR liveness tests.} \
+            -access read-write \
+            -fields [list \
+                [::mu3e::cmsis::svd::field value 0 32 \
+                    -description {Read/write scratchpad value, reset to zero.} \
+                    -access read-write]]] \
+        [::mu3e::cmsis::svd::register CAPABILITY 0x0C \
             -description {1-Wire controller capability register.} \
             -access read-only \
             -fields [list \
@@ -18,7 +43,7 @@ proc ::mu3e::cmsis::spec::build_device {} {
                 [::mu3e::cmsis::svd::field n_sensors 16 16 \
                     -description {Reserved for future sensor-count reporting; currently reads zero.} \
                     -access read-only]]] \
-        [::mu3e::cmsis::svd::register STATUS 0x04 \
+        [::mu3e::cmsis::svd::register STATUS 0x10 \
             -description {Line select and per-line control/status register. Reads return the selected line and its sticky error summary. Writes update sel_line and processor_go for the addressed line.} \
             -access read-write \
             -fields [list \
@@ -43,45 +68,45 @@ proc ::mu3e::cmsis::spec::build_device {} {
                 [::mu3e::cmsis::svd::field reserved1 27 5 \
                     -description {Reserved, read as zero.} \
                     -access read-only]]] \
-        [::mu3e::cmsis::svd::register SENSOR0_TEMP_F32 0x08 \
+        [::mu3e::cmsis::svd::register SENSOR0_TEMP_F32 0x14 \
             -description {IEEE-754 float32 temperature reading for sensor 0.} \
             -access read-only \
             -fields [list [::mu3e::cmsis::svd::field value 0 32 -description {Raw float32 temperature sample for sensor 0.} -access read-only]]] \
-        [::mu3e::cmsis::svd::register SENSOR1_TEMP_F32 0x0C \
+        [::mu3e::cmsis::svd::register SENSOR1_TEMP_F32 0x18 \
             -description {IEEE-754 float32 temperature reading for sensor 1.} \
             -access read-only \
             -fields [list [::mu3e::cmsis::svd::field value 0 32 -description {Raw float32 temperature sample for sensor 1.} -access read-only]]] \
-        [::mu3e::cmsis::svd::register SENSOR2_TEMP_F32 0x10 \
+        [::mu3e::cmsis::svd::register SENSOR2_TEMP_F32 0x1C \
             -description {IEEE-754 float32 temperature reading for sensor 2.} \
             -access read-only \
             -fields [list [::mu3e::cmsis::svd::field value 0 32 -description {Raw float32 temperature sample for sensor 2.} -access read-only]]] \
-        [::mu3e::cmsis::svd::register SENSOR3_TEMP_F32 0x14 \
+        [::mu3e::cmsis::svd::register SENSOR3_TEMP_F32 0x20 \
             -description {IEEE-754 float32 temperature reading for sensor 3.} \
             -access read-only \
             -fields [list [::mu3e::cmsis::svd::field value 0 32 -description {Raw float32 temperature sample for sensor 3.} -access read-only]]] \
-        [::mu3e::cmsis::svd::register SENSOR4_TEMP_F32 0x18 \
+        [::mu3e::cmsis::svd::register SENSOR4_TEMP_F32 0x24 \
             -description {IEEE-754 float32 temperature reading for sensor 4.} \
             -access read-only \
             -fields [list [::mu3e::cmsis::svd::field value 0 32 -description {Raw float32 temperature sample for sensor 4.} -access read-only]]] \
-        [::mu3e::cmsis::svd::register SENSOR5_TEMP_F32 0x1C \
+        [::mu3e::cmsis::svd::register SENSOR5_TEMP_F32 0x28 \
             -description {IEEE-754 float32 temperature reading for sensor 5.} \
             -access read-only \
             -fields [list [::mu3e::cmsis::svd::field value 0 32 -description {Raw float32 temperature sample for sensor 5.} -access read-only]]]]
 
     return [::mu3e::cmsis::svd::device MU3E_ONEWIRE_MASTER_CONTROLLER \
-        -version 26.1.0 \
+        -version 26.2.1 \
         -description {CMSIS-SVD description of the onewire_master_controller CSR aperture. BaseAddress is 0 because this file describes the relative CSR aperture of the IP; system integration supplies the live slave base address.} \
         -peripherals [list \
             [::mu3e::cmsis::svd::peripheral ONEWIRE_MASTER_CONTROLLER_CSR 0x0 \
-                -description {Relative 8-word 1-Wire controller CSR aperture.} \
+                -description {Relative 11-word 1-Wire controller CSR aperture with common Mu3e UID/META header.} \
                 -groupName MU3E_ONEWIRE \
-                -addressBlockSize 0x20 \
+                -addressBlockSize 0x2C \
                 -registers $registers]]]
 }
 
 if {[info exists ::argv0] &&
     [file normalize $::argv0] eq [file normalize [info script]]} {
-    set out_path [file join $script_dir .. systems system_20260428_onewire_controller_master syn ip onewire_master_controller onewire_master_controller.svd]
+    set out_path [file join $script_dir onewire_master_controller.svd]
     if {[llength $::argv] >= 1} {
         set out_path [lindex $::argv 0]
     }

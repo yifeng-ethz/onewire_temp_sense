@@ -186,12 +186,12 @@ begin
 	)
 	port map ( 
 		-- input fast clock and reset interface
-		i_clk 			=> i_clk, -- input clock
-		i_reset_n 		=> i_rst_n,	-- input reset
+		clk 			=> i_clk, -- input clock
+		reset_n 		=> i_rst_n,	-- input reset
 		-- pseudo slow clock
-		o_clk		 	=> pseudo_clk_slow, -- so far not used, can be slow down the overall state machine to release more timing slack
+		pseudo_clk	 	=> pseudo_clk_slow, -- so far not used, can be slow down the overall state machine to release more timing slack
 		-- slow tick (active for one fast cycle at the rising edge of the slow clock)
-		o_tick			=> slow_tick
+		tick			=> slow_tick
 	);
 	
 	

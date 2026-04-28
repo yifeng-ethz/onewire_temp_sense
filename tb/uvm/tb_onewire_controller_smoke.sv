@@ -17,7 +17,7 @@ module tb_onewire_controller_smoke;
     localparam logic [3:0] MASTER_CSR_FIFO_FILL = 4'd2;
 
     localparam logic [31:0] EXPECTED_UID          = 32'h4f57_4d43; // OWMC
-    localparam logic [31:0] EXPECTED_META_VERSION = 32'h1a02_01ac; // 26.2.0.0428
+    localparam logic [31:0] EXPECTED_META_VERSION = 32'h1a02_11ac; // 26.2.1.0428
     localparam logic [31:0] EXPECTED_META_DATE    = 32'd20260428;
     localparam logic [31:0] EXPECTED_META_GIT     = 32'd0;
     localparam logic [31:0] EXPECTED_META_INST    = 32'd0;
