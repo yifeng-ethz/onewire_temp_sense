@@ -2,3 +2,7 @@
 *.bak
 greybox_tmp/
 .qsys_edit/
+/model/tlm/systemc/ds18b20/build/
+/tb/uvm/builds/
+/tb/uvm/transcript
+/tb/uvm/vsim.wlf

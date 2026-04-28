@@ -28,6 +28,7 @@ mapping.
 | DUT_IMPL | `mixed_vhdl_sv` |
 | ONEWIRE_N_DQ_LINES | `6` |
 | SENSOR_TOPOLOGY | `one DS18B20-compatible device per DQ line` |
+| SENSOR_MODEL | `SystemC transaction/link reference plus SV RC line model` |
 | CONTROLLER_CSR_MAP | `UID=0, META=1, SCRATCH=2, CAPABILITY=3, STATUS=4, SENSOR0..5_TEMP_F32=5..10` |
 | probe_only_exclusions | `Read-ROM serial probe, scratchpad CRC checker hookup, UCDB code coverage` |
 
@@ -78,5 +79,6 @@ mapping.
 - [`DV_COV.md`](DV_COV.md) — feature-derived coverage scoreboard
 - [`DV_REPORT.json`](DV_REPORT.json) — machine-readable scoreboard summary
 - [`BUG_HISTORY.md`](BUG_HISTORY.md) — active bug ledger
+- [`../../model/REPORT/DS18B20_MODEL_REPORT.md`](../../model/REPORT/DS18B20_MODEL_REPORT.md) — sensor model evidence
 
 _Regenerate with `make -C onewire_temp_sense/tb/uvm regress` for the implemented slice. Replace with a generator-owned `dv_report_gen.py` refresh once the full bucket regression is automated._

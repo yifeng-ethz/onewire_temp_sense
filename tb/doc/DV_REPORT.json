@@ -3,6 +3,7 @@
   "date": "2026-04-28",
   "rtl_variant": "26.2.0 common-csr-header",
   "status": "partial_unit_slice_pass_board_pending",
+  "sensor_model": "SystemC transaction/link reference plus SV RC line model",
   "csr_map": {
     "UID": 0,
     "META": 1,
@@ -16,6 +17,7 @@
     "isolated_command": "make -C onewire_temp_sense/tb/uvm regress",
     "continuous_command": "make -C onewire_temp_sense/tb/uvm run CASE=ALL_BUCKETS_FRAME MODE=all_buckets_frame",
     "result": "PASS",
+    "latest_isolated_timestamp": "2026-04-28T17:27:17",
     "implemented_cases": 55,
     "covered_features": 20,
     "checked_words": [

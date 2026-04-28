@@ -7,7 +7,9 @@ cover multiple features, and several cases may only reinforce the same feature.
 Latest evidence:
 
 - Isolated named-case slice: `../REPORT/onewire_regression_summary.json`
+  (`2026-04-28T17:27:17`, 55/55 implemented BASIC+ERROR cases PASS)
 - Continuous no-restart frame: `../REPORT/ALL_BUCKETS_FRAME.md`
+- DS18B20 SystemC trace: `../../model/artifacts/ds18b20_systemc_trace.csv`
 
 ## Legend
 

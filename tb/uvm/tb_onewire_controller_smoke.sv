@@ -55,7 +55,8 @@ module tb_onewire_controller_smoke;
     logic [N_DQ_LINES-1:0] dq_out;
     logic [N_DQ_LINES-1:0] dq_oe;
     logic [N_DQ_LINES-1:0] sensor_present;
-    tri1 [N_DQ_LINES-1:0] dq;
+    logic [N_DQ_LINES-1:0] sensor_drive_low;
+    real dq_voltage_v[N_DQ_LINES];
 
     logic m_ctrl_read;
     logic [31:0] m_ctrl_readdata;
@@ -76,7 +77,8 @@ module tb_onewire_controller_smoke;
     logic [N_DQ_LINES-1:0] m_dq_out;
     logic [N_DQ_LINES-1:0] m_dq_oe;
     logic [N_DQ_LINES-1:0] master_sensor_present;
-    tri1 [N_DQ_LINES-1:0] m_dq;
+    logic [N_DQ_LINES-1:0] master_sensor_drive_low;
+    real m_dq_voltage_v[N_DQ_LINES];
 
     logic mnp_ctrl_read;
     logic [31:0] mnp_ctrl_readdata;
@@ -97,45 +99,66 @@ module tb_onewire_controller_smoke;
     logic [N_DQ_LINES-1:0] mnp_dq_out;
     logic [N_DQ_LINES-1:0] mnp_dq_oe;
     logic [N_DQ_LINES-1:0] mnp_sensor_present;
-    tri1 [N_DQ_LINES-1:0] mnp_dq;
+    logic [N_DQ_LINES-1:0] mnp_sensor_drive_low;
+    real mnp_dq_voltage_v[N_DQ_LINES];
 
     string ow_case;
     string ow_mode;
     int error_count;
-
-    assign dq_in = dq;
-    assign m_dq_in = m_dq;
-    assign mnp_dq_in = mnp_dq;
 
     genvar dq_idx;
     generate
         for (dq_idx = 0; dq_idx < N_DQ_LINES; dq_idx++) begin : gen_dq
             localparam int signed SENSOR_TEMP_C_X16 = (dq_idx == 0) ? 0 : ((22 + dq_idx) * 16 + dq_idx);
 
-            assign dq[dq_idx] = dq_oe[dq_idx] ? dq_out[dq_idx] : 1'bz;
+            onewire_rc_line_model controller_line (
+                .master_drive_low(dq_oe[dq_idx] && !dq_out[dq_idx]),
+                .master_drive_high(dq_oe[dq_idx] && dq_out[dq_idx]),
+                .sensor_drive_low(sensor_drive_low[dq_idx]),
+                .dq_logic(dq_in[dq_idx]),
+                .dq_voltage_v(dq_voltage_v[dq_idx])
+            );
+
             ds18b20_1wire_model #(
                 .ROM_CODE(64'h2800000000000100 + dq_idx),
                 .TEMP_C_X16(SENSOR_TEMP_C_X16)
             ) sensor (
-                .dq(dq[dq_idx]),
+                .dq_in(dq_in[dq_idx]),
+                .dq_drive_low(sensor_drive_low[dq_idx]),
                 .present_enable(sensor_present[dq_idx])
             );
 
-            assign m_dq[dq_idx] = m_dq_oe[dq_idx] ? m_dq_out[dq_idx] : 1'bz;
+            onewire_rc_line_model direct_line (
+                .master_drive_low(m_dq_oe[dq_idx] && !m_dq_out[dq_idx]),
+                .master_drive_high(m_dq_oe[dq_idx] && m_dq_out[dq_idx]),
+                .sensor_drive_low(master_sensor_drive_low[dq_idx]),
+                .dq_logic(m_dq_in[dq_idx]),
+                .dq_voltage_v(m_dq_voltage_v[dq_idx])
+            );
+
             ds18b20_1wire_model #(
                 .ROM_CODE(64'h2800000000000200 + dq_idx),
                 .TEMP_C_X16(SENSOR_TEMP_C_X16)
             ) master_sensor (
-                .dq(m_dq[dq_idx]),
+                .dq_in(m_dq_in[dq_idx]),
+                .dq_drive_low(master_sensor_drive_low[dq_idx]),
                 .present_enable(master_sensor_present[dq_idx])
             );
 
-            assign mnp_dq[dq_idx] = mnp_dq_oe[dq_idx] ? mnp_dq_out[dq_idx] : 1'bz;
+            onewire_rc_line_model no_parasitic_line (
+                .master_drive_low(mnp_dq_oe[dq_idx] && !mnp_dq_out[dq_idx]),
+                .master_drive_high(mnp_dq_oe[dq_idx] && mnp_dq_out[dq_idx]),
+                .sensor_drive_low(mnp_sensor_drive_low[dq_idx]),
+                .dq_logic(mnp_dq_in[dq_idx]),
+                .dq_voltage_v(mnp_dq_voltage_v[dq_idx])
+            );
+
             ds18b20_1wire_model #(
                 .ROM_CODE(64'h2800000000000300 + dq_idx),
                 .TEMP_C_X16(SENSOR_TEMP_C_X16)
             ) master_np_sensor (
-                .dq(mnp_dq[dq_idx]),
+                .dq_in(mnp_dq_in[dq_idx]),
+                .dq_drive_low(mnp_sensor_drive_low[dq_idx]),
                 .present_enable(mnp_sensor_present[dq_idx])
             );
         end

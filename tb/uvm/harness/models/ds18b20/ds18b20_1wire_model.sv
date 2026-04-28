@@ -6,7 +6,8 @@ module ds18b20_1wire_model #(
     parameter int CONVERT_TIME_US = 1000,
     parameter bit DEBUG = 1'b0
 ) (
-    inout tri1 dq,
+    input logic dq_in,
+    output logic dq_drive_low,
     input logic present_enable
 );
     localparam byte CMD_READ_ROM        = 8'h33;
@@ -14,11 +15,8 @@ module ds18b20_1wire_model #(
     localparam byte CMD_CONVERT_T       = 8'h44;
     localparam byte CMD_READ_SCRATCHPAD = 8'hbe;
 
-    bit drive_low;
     bit conversion_done;
     byte scratchpad[9];
-
-    assign dq = drive_low ? 1'b0 : 1'bz;
 
     function automatic byte crc8_byte(input byte crc_in, input byte data_in);
         byte crc;
@@ -67,9 +65,9 @@ module ds18b20_1wire_model #(
         realtime low_start;
         realtime low_width;
         got_reset = 1'b0;
-        @(negedge dq);
+        @(negedge dq_in);
         low_start = $realtime;
-        @(posedge dq);
+        @(posedge dq_in);
         low_width = $realtime - low_start;
         if (low_width >= 480_000.0) begin
             got_reset = 1'b1;
@@ -78,9 +76,9 @@ module ds18b20_1wire_model #(
 
     task automatic send_presence();
         #(30_000);
-        drive_low = 1'b1;
+        dq_drive_low = 1'b1;
         #(120_000);
-        drive_low = 1'b0;
+        dq_drive_low = 1'b0;
     endtask
 
     task automatic read_master_byte(output byte value, output bit got_reset);
@@ -89,15 +87,15 @@ module ds18b20_1wire_model #(
         for (int bit_idx = 0; bit_idx < 8; bit_idx++) begin
             realtime low_start;
             realtime low_width;
-            @(negedge dq);
+            @(negedge dq_in);
             low_start = $realtime;
             #(15_000);
-            value[bit_idx] = dq;
+            value[bit_idx] = dq_in;
             if (DEBUG) begin
-                $display("%0t DS18B20 rom=0x%016x rx_bit[%0d]=%0b", $time, ROM_CODE, bit_idx, dq);
+                $display("%0t DS18B20 rom=0x%016x rx_bit[%0d]=%0b", $time, ROM_CODE, bit_idx, dq_in);
             end
-            if (dq === 1'b0) begin
-                @(posedge dq);
+            if (dq_in === 1'b0) begin
+                @(posedge dq_in);
                 low_width = $realtime - low_start;
                 if (low_width >= 480_000.0) begin
                     got_reset = 1'b1;
@@ -112,12 +110,12 @@ module ds18b20_1wire_model #(
 
     task automatic write_slave_byte(input byte value);
         for (int bit_idx = 0; bit_idx < 8; bit_idx++) begin
-            @(negedge dq);
+            @(negedge dq_in);
             if (value[bit_idx] == 1'b0) begin
                 #(2_000);
-                drive_low = 1'b1;
+                dq_drive_low = 1'b1;
                 #(58_000);
-                drive_low = 1'b0;
+                dq_drive_low = 1'b0;
             end else begin
                 #(60_000);
             end
@@ -136,7 +134,7 @@ module ds18b20_1wire_model #(
         byte cmd;
         bit got_reset;
 
-        drive_low = 1'b0;
+        dq_drive_low = 1'b0;
         conversion_done = 1'b1;
         refresh_scratchpad();
 
@@ -146,14 +144,14 @@ module ds18b20_1wire_model #(
                 continue;
             end
             if (!present_enable) begin
-                drive_low = 1'b0;
+                dq_drive_low = 1'b0;
                 continue;
             end
             send_presence();
 
             forever begin
                 if (!present_enable) begin
-                    drive_low = 1'b0;
+                    dq_drive_low = 1'b0;
                     break;
                 end
                 read_master_byte(cmd, got_reset);
