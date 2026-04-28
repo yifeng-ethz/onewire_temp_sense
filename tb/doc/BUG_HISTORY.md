@@ -37,7 +37,7 @@ Historical formal note:
 | [BUG-001-R](#bug-001-r-zero-scratchpad-converts-to-10-c) | R | soft error | `common (control-path routine)` | fixed in unit sim; board pending | Phase-5 environment readback on `2026-04-28` | `pending` | Zeroed scratchpad bytes converted to IEEE-754 `1.0`; RTL now reports zero for raw zero and exposes `sample_valid`. |
 | [BUG-002-H](#bug-002-h-ds18b20-model-skipped-command-slots-after-master-written-one-bits) | H | non-datapath-refactor | `directed-only (new unit harness)` | fixed | OneWire smoke tb on `2026-04-28` | `pending` | DS18B20 model waited for a posedge that already happened on write-1 slots, causing command decode drift. |
 | [BUG-003-R](#bug-003-r-controller-crc_err-status-bit-was-uninitialized) | R | soft error | `common (control-path routine)` | fixed in unit sim; board pending | `B001` after 4-state checker tightening on `2026-04-28` | `pending` | Controller `STATUS[24] crc_err` was declared but not reset/driven, so stricter DV saw `X` on healthy reads. |
-| [BUG-004-R](#bug-004-r-125-mhz-odd-divider-never-advanced) | R | hard stuck error | `common (FEB 125 MHz control-path routine)` | fixed in unit regression; Qsys/board pending | Phase-5 OneWire retry60 board evidence on `2026-04-28` | `pending` | Shared 1 us divider stalled for odd ratios, so FEB 125 MHz OneWire timers never ticked and no line reached sample_valid. |
+| [BUG-004-R](#bug-004-r-125-mhz-odd-divider-never-advanced) | R | hard stuck error | `common (FEB 125 MHz control-path routine)` | fixed in unit regression; Qsys/board pending | Phase-5 OneWire retry60 board evidence on `2026-04-28` | `658d374bc4280892cfd3bc89ecf64b9279fe4431` | Shared 1 us divider stalled for odd ratios, so FEB 125 MHz OneWire timers never ticked and no line reached sample_valid. |
 
 ## 2026-04-28
 
@@ -78,7 +78,7 @@ Historical formal note:
   - unit harness now classifies a valid 0 C sample separately from no-data
     status through `sample_valid`
 - Commit:
-  - pending
+  - `658d374bc4280892cfd3bc89ecf64b9279fe4431`
 
 ### BUG-002-H: DS18B20 model skipped command slots after master-written one bits
 - First seen in:
