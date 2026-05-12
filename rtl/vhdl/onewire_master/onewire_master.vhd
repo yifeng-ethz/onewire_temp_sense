@@ -368,8 +368,24 @@ architecture rtl of onewire_master is
 		csr_w_2				: csr_w_2_t;
 	end record;
 	
-	-- signals
-	signal mmap					: mmap_t;
+	constant mmap					: mmap_t := (
+		csr_w_0 => (
+			commit => (others => '0'),
+			busy => (others => '0')
+		),
+		csr_w_1 => (
+			direction => (others => '0'),
+			init => (others => '0'),
+			paracitic_pw => (others => '0'),
+			usewire_id => (others => '0'),
+			tot_bytes => (others => '0'),
+			wire_id => (others => '0')
+		),
+		csr_w_2 => (
+			txfifo_usedw => (others => '0'),
+			rxfifo_usedw => (others => '0')
+		)
+	);
 	
 	-- ---------------------------------
 	-- pipes
@@ -1270,7 +1286,6 @@ begin
 
 
 end architecture rtl;
-
 
 
 
